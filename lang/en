@@ -1,0 +1,54 @@
+<?php
+
+return [
+    'store' => 'Store',
+    'cart' => 'Cart',
+    'checkout' => 'Checkout',
+    'dashboard' => 'Dashboard',
+    'services' => 'Services',
+    'invoices' => 'Invoices',
+    'tickets' => 'Tickets',
+    'domains' => 'Domains',
+    'credits' => 'Credits',
+    'notifications' => 'Notifications',
+    'profile' => 'Profile',
+    'settings' => 'Settings',
+    'knowledge_base' => 'Knowledge Base',
+    'system_status' => 'System Status',
+    'home' => 'Home',
+    'login' => 'Login',
+    'register' => 'Register',
+    'logout' => 'Logout',
+    'welcome' => 'Welcome',
+
+    'status' => [
+        'pending' => 'Pending',
+        'active' => 'Active',
+        'suspended' => 'Suspended',
+        'cancelled' => 'Cancelled',
+        'terminated' => 'Terminated',
+        'paid' => 'Paid',
+        'overdue' => 'Overdue',
+        'refunded' => 'Refunded',
+        'open' => 'Open',
+        'closed' => 'Closed',
+        'on_hold' => 'On Hold',
+    ],
+
+    'actions' => [
+        'save' => 'Save',
+        'cancel' => 'Cancel',
+        'delete' => 'Delete',
+        'edit' => 'Edit',
+        'create' => 'Create',
+        'search' => 'Search',
+        'filter' => 'Filter',
+    ],
+
+    'messages' => [
+        'cart_empty' => 'Your cart is empty',
+        'no_records' => 'No records found',
+        'confirm_action' => 'Are you sure?',
+        'action_undo' => 'This action cannot be undone.',
+    ],
+];

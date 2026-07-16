@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@source '../../vendor/filament/filament/resources/views/**/*.blade.php';
+@source '../../vendor/filament/support/resources/views/**/*.blade.php';
+@source '../../vendor/filament/tables/resources/views/**/*.blade.php';
+@source '../../vendor/filament/forms/resources/views/**/*.blade.php';
+@source '../../vendor/filament/actions/resources/views/**/*.blade.php';
+@source '../../vendor/filament/infolists/resources/views/**/*.blade.php';
+@source '../../vendor/filament/notifications/resources/views/**/*.blade.php';
+@source '../../vendor/filament/widgets/resources/views/**/*.blade.php';
+@source '../../resources/views/filament/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    select,
+    select.form-select {
+        @apply bg-white dark:bg-white/5 dark:text-white dark:border-white/10;
+    }
+}
