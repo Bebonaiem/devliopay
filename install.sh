@@ -14,12 +14,12 @@ NC='\033[0m'
 
 print_banner() {
     echo -e "${CYAN}"
-    echo "  ____             _                        ____  _               "
-    echo " |  _ \  ___  _ __| | ___   _  ___  _ __   |  _ \\(_)_ __   __ _  "
-    echo " | | | |/ _ \\| '__| |/ / | | |/ _ \\| '_ \\  | |_) | | '_ \\ / _\` | "
-    echo " | |_| | (_) | |  |   <| |_| | (_) | | | | |  __/| | | | | (_| | "
-    echo " |____/ \___/|_|  |_|\\_\\\\__, |\\___/|_| |_| |_|   |_|_| |_|\\__, | "
-    echo "                         |___/                             |___/  "
+    echo "██████╗ ███████╗██╗   ██╗██╗     ██╗ ██████╗ ██████╗  █████╗ ██╗   ██╗"
+    echo "██╔══██╗██╔════╝██║   ██║██║     ██║██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝"
+    echo "██║  ██║█████╗  ██║   ██║██║     ██║██║   ██║██████╔╝███████║ ╚████╔╝ "
+    echo "██║  ██║██╔══╝  ╚██╗ ██╔╝██║     ██║██║   ██║██╔═══╝ ██╔══██║  ╚██╔╝  "
+    echo "██████╔╝███████╗ ╚████╔╝ ███████╗██║╚██████╔╝██║     ██║  ██║   ██║   "
+    echo "╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚═╝  ╚═╝   ╚═╝   "
     echo -e "${NC}"
     echo -e "  ${CYAN}Automatic Installation Script for Ubuntu${NC}"
     echo ""
@@ -67,6 +67,10 @@ fi
 git clone https://github.com/Bebonaiem/devliopay.git "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
+# Set ownership before composer/npm so they can write files
+chown -R devliopay:devliopay "$INSTALL_DIR"
+git config --global --add safe.directory "$INSTALL_DIR"
+
 echo -e "${YELLOW}[7/12] Installing PHP Dependencies${NC}"
 sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction
 
@@ -83,6 +87,7 @@ php artisan key:force --no-interaction
 # Configure database
 touch database/database.sqlite
 chmod 664 database/database.sqlite
+chown devliopay:devliopay database/database.sqlite
 
 # Update .env
 sed -i "s|APP_URL=http://localhost|APP_URL=http://${DOMAIN}|g" .env
