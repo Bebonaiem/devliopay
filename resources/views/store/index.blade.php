@@ -46,8 +46,13 @@
                     <p class="text-sm text-gray-400 line-clamp-2 mb-4">{!! nl2br(e($product->description ?? 'High-performance hosting solution.')) !!}</p>
                     <div class="flex items-end justify-between">
                         <div>
+                            @php
+                                $cheapest = $product->pricing->sortBy(fn ($p) => $p->currencies->first()?->pivot->amount ?? PHP_INT_MAX)->first();
+                                $cheapestSymbol = $cheapest?->currencies->first()?->symbol ?? $defaultCurrencySymbol;
+                                $cheapestAmount = $cheapest?->currencies->first()?->pivot->amount ?? $product->base_price ?? 0;
+                            @endphp
                             <span class="text-xs text-gray-500">Starting from</span>
-                            <div class="text-2xl font-black">{{ $product->pricing->first()?->currencies->first()?->symbol ?? $defaultCurrencySymbol }}{{ number_format($product->pricing->min('price') ?? $product->base_price ?? 0, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></div>
+                            <div class="text-2xl font-black">{{ $cheapestSymbol }}{{ number_format($cheapestAmount, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></div>
                         </div>
                         <a href="{{ route('store.show', $product->slug) }}" class="btn-primary px-5 py-2.5 rounded-xl text-xs font-semibold text-white shadow-lg shadow-brand-500/20">
                             Configure
