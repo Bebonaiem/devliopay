@@ -31,11 +31,12 @@ class GeneralSettings extends Page implements HasForms
         $this->form->fill([
             'company_name' => Setting::get('company_name', config('app.name', 'DevlioPay')),
             'company_email' => Setting::get('company_email', ''),
-            'company_url' => Setting::get('company_url', ''),
+            'company_url' => Setting::get('company_url', url('/')),
             'company_phone' => Setting::get('company_phone', ''),
             'company_address' => Setting::get('company_address', ''),
             'company_logo' => Setting::get('company_logo', ''),
             'company_logo_display' => Setting::get('company_logo_display', 'name_only'),
+            'company_favicon' => Setting::get('company_favicon', ''),
             'company_footer_text' => Setting::get('company_footer_text', ''),
             'default_currency' => Setting::get('default_currency', 'USD'),
             'default_currency_symbol' => Setting::get('default_currency_symbol', '$'),
@@ -57,7 +58,9 @@ class GeneralSettings extends Page implements HasForms
                             ->required(),
                         Forms\Components\TextInput::make('company_url')
                             ->label('Website URL')
-                            ->url(),
+                            ->url()
+                            ->default(url('/'))
+                            ->dehydrated(fn ($state) => $this->syncUrlToEnv($state)),
                         Forms\Components\TextInput::make('company_phone')
                             ->label('Phone Number'),
                         Forms\Components\Textarea::make('company_address')
@@ -81,6 +84,12 @@ class GeneralSettings extends Page implements HasForms
                                 'name_only' => 'Company Name Only',
                             ])
                             ->default('name_only'),
+                        Forms\Components\FileUpload::make('company_favicon')
+                            ->label('Favicon')
+                            ->image()
+                            ->disk('public')
+                            ->directory('company')
+                            ->columnSpanFull(),
                         Forms\Components\Textarea::make('company_footer_text')
                             ->label('Footer text shown to clients'),
                     ])->columns(2),
@@ -110,9 +119,50 @@ class GeneralSettings extends Page implements HasForms
 
         Setting::flushCache();
 
+        if (!empty($data['company_url'])) {
+            $this->syncUrlToEnv($data['company_url']);
+        }
+
         Notification::make()
             ->title('General settings saved')
             ->success()
             ->send();
+    }
+
+    private function syncUrlToEnv(string $url): void
+    {
+        $url = rtrim($url, '/');
+        $envFile = base_path('.env');
+
+        if (!file_exists($envFile)) {
+            return;
+        }
+
+        $content = file_get_contents($envFile);
+
+        if (str_contains($content, 'APP_URL=')) {
+            $content = preg_replace("/^APP_URL=.*/m", "APP_URL={$url}", $content);
+        } else {
+            $content .= "\nAPP_URL={$url}";
+        }
+
+        if (str_contains($content, 'APP_DOMAIN=')) {
+            $domain = parse_url($url, PHP_URL_HOST) ?? '';
+            $content = preg_replace("/^APP_DOMAIN=.*/m", "APP_DOMAIN={$domain}", $content);
+        } else {
+            $domain = parse_url($url, PHP_URL_HOST) ?? '';
+            $content .= "\nAPP_DOMAIN={$domain}";
+        }
+
+        file_put_contents($envFile, $content);
+
+        putenv("APP_URL={$url}");
+        $_ENV['APP_URL'] = $url;
+        config(['app.url' => $url]);
+
+        $domain = parse_url($url, PHP_URL_HOST) ?? '';
+        putenv("APP_DOMAIN={$domain}");
+        $_ENV['APP_DOMAIN'] = $domain;
+        config(['app.domain' => $domain]);
     }
 }

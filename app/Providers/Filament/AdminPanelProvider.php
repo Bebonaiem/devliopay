@@ -64,7 +64,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 'head',
-                fn () => <<<'HTML'
+                fn () => (Setting::get('company_favicon')
+                    ? '<link rel="icon" type="image/x-icon" href="/storage/' . ltrim(Setting::get('company_favicon'), '/') . '">'
+                    : '<link rel="icon" type="image/x-icon" href="/favicon.ico">')
+                . <<<'HTML'
                 <style>
                     button, .fi-btn, .fi-action button, a[class*="bg-primary"], a[class*="bg-danger"], a[class*="bg-success"], a[class*="bg-warning"] {
                         border: 1px solid rgba(255, 255, 255, 0.1) !important;
