@@ -41,7 +41,7 @@
                         </div>
                         @endif
                         <div class="text-right">
-                        <span class="text-sm font-semibold">{{ $itemSymbol }}{{ number_format($item['line_total'] ?? $item['price'] ?? 0, 2) }}<span class="text-gray-500 font-normal">{{ $item['pricing']->frequency ?? '/mo' }}</span></span>
+                        <span class="text-sm font-semibold">{{ $itemSymbol }}{{ number_format($item['price'] ?? 0, 2) }}<span class="text-gray-500 font-normal">{{ $item['pricing']->frequency ?? '/mo' }}</span></span>
                         @if(($item['setup_fee'] ?? 0) > 0)
                         <div class="text-[11px] text-amber-400">+{{ $itemSymbol }}{{ number_format($item['setup_fee'], 2) }} setup</div>
                         @endif
@@ -81,7 +81,7 @@
             <hr class="border-white/5">
             <div class="flex items-center justify-between">
                 <span class="text-base font-semibold">Total</span>
-                <span class="text-xl font-black">{{ $summarySymbol }}{{ number_format($total ?? 0, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></span>
+                <span class="text-xl font-black">{{ $summarySymbol }}{{ number_format($total ?? 0, 2) }}</span>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-2">
