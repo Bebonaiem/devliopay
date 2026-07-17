@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\RevenueChart;
 use App\Filament\Widgets\RevenueOverview;
+use App\Models\Setting;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,8 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('DevlioPay')
-            ->brandLogo(asset('logo.svg'))
+            ->brandName(Setting::get('company_name', config('app.name', 'DevlioPay')))
+            ->brandLogo(Setting::get('company_logo') ? asset('storage/'.Setting::get('company_logo')) : asset('logo.svg'))
             ->colors([
                 'primary' => Color::Indigo,
             ])

@@ -39,6 +39,16 @@ class AppServiceProvider extends ServiceProvider
             $cart = session()->get('cart', []);
             $cartCount = is_array($cart) ? count($cart) : 0;
             $view->with('cartCount', $cartCount);
+
+            $view->with('companyName', Setting::get('company_name', config('app.name', 'DevlioPay')));
+            $view->with('companyLogo', Setting::get('company_logo', ''));
+            $view->with('companyEmail', Setting::get('company_email', ''));
+            $view->with('companyUrl', Setting::get('company_url', ''));
+            $view->with('companyPhone', Setting::get('company_phone', ''));
+            $view->with('companyAddress', Setting::get('company_address', ''));
+            $view->with('companyFooterText', Setting::get('company_footer_text', ''));
+            $view->with('defaultCurrency', Setting::get('default_currency', 'USD'));
+            $view->with('defaultCurrencySymbol', Setting::get('default_currency_symbol', '$'));
         });
     }
 }

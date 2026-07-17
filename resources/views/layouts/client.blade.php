@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Client Area') - {{ config('app.name', 'DevlioPay') }}</title>
+    <title>@yield('title', 'Client Area') - {{ $companyName }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="bg-gray-950 text-gray-100 font-sans antialiased min-h-screen" x-data="{ sidebarCollapsed: false, sidebarMobileOpen: false }">
+<body class="bg-gray-950 text-gray-100 font-sans antialiased min-h-screen flex flex-col" x-data="{ sidebarCollapsed: false, sidebarMobileOpen: false }">
     {{-- Mobile overlay --}}
     <div x-show="sidebarMobileOpen" x-cloak @click="sidebarMobileOpen = false" class="fixed inset-0 bg-black/60 z-40 lg:hidden" x-transition.opacity></div>
 
@@ -65,10 +65,14 @@
             {{-- Logo --}}
             <div class="flex items-center gap-3 px-5 h-16 flex-shrink-0 border-b border-white/5">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 flex-shrink-0">
-                        <i data-lucide="zap" class="w-4 h-4 text-white"></i>
-                    </div>
-                    <span class="text-base font-bold tracking-tight" x-show="!sidebarCollapsed" x-cloak>Devlio<span class="text-brand-400">Pay</span></span>
+                    @if($companyLogo)
+                        <img src="{{ asset('storage/'.$companyLogo) }}" alt="{{ $companyName }}" class="h-8 w-auto rounded-lg">
+                    @else
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 flex-shrink-0">
+                            <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+                        </div>
+                    @endif
+                    <span class="text-base font-bold tracking-tight" x-show="!sidebarCollapsed" x-cloak>{{ $companyName }}</span>
                 </a>
             </div>
 
@@ -157,10 +161,14 @@
             {{-- Logo --}}
             <div class="flex items-center justify-between px-5 h-16 flex-shrink-0 border-b border-white/5">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 flex-shrink-0">
-                        <i data-lucide="zap" class="w-4 h-4 text-white"></i>
-                    </div>
-                    <span class="text-base font-bold tracking-tight">Devlio<span class="text-brand-400">Pay</span></span>
+                    @if($companyLogo)
+                        <img src="{{ asset('storage/'.$companyLogo) }}" alt="{{ $companyName }}" class="h-8 w-auto rounded-lg">
+                    @else
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 flex-shrink-0">
+                            <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+                        </div>
+                    @endif
+                    <span class="text-base font-bold tracking-tight">{{ $companyName }}</span>
                 </a>
                 <button @click="sidebarMobileOpen = false" class="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -247,7 +255,7 @@
     </aside>
 
     {{-- Main --}}
-    <div class="flex-1 min-w-0 flex flex-col transition-all duration-300" :class="sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64'">
+    <div class="flex-1 min-h-0 flex flex-col transition-all duration-300" :class="sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64'">
         {{-- Top bar --}}
         <header class="sticky top-0 z-30 h-16 flex items-center gap-4 px-6 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
             <button @click="sidebarMobileOpen = true" class="lg:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5">
@@ -301,6 +309,26 @@
     @endif
 
     @include('components.confirm-modal')
+
+    {{-- Footer --}}
+    <footer class="border-t border-white/5 py-6 px-6 mt-auto">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+            <div class="flex items-center gap-2">
+                @if($companyLogo)
+                    <img src="{{ asset('storage/'.$companyLogo) }}" alt="{{ $companyName }}" class="h-4 w-auto">
+                @endif
+                <span>{{ $companyFooterText ?: $companyName . ' — All rights reserved.' }}</span>
+            </div>
+            <div class="flex items-center gap-3">
+                @if($companyUrl)
+                    <a href="{{ $companyUrl }}" target="_blank" class="hover:text-gray-300 transition-colors">Website</a>
+                @endif
+                @if($companyEmail)
+                    <a href="mailto:{{ $companyEmail }}" class="hover:text-gray-300 transition-colors">Support</a>
+                @endif
+            </div>
+        </div>
+    </footer>
 
     @stack('scripts')
     <script>lucide.createIcons();</script>

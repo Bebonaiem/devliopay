@@ -29,7 +29,7 @@ class GeneralSettings extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
-            'company_name' => Setting::get('company_name', ''),
+            'company_name' => Setting::get('company_name', config('app.name', 'DevlioPay')),
             'company_email' => Setting::get('company_email', ''),
             'company_url' => Setting::get('company_url', ''),
             'company_phone' => Setting::get('company_phone', ''),
@@ -37,6 +37,7 @@ class GeneralSettings extends Page implements HasForms
             'company_logo' => Setting::get('company_logo', ''),
             'company_footer_text' => Setting::get('company_footer_text', ''),
             'default_currency' => Setting::get('default_currency', 'USD'),
+            'default_currency_symbol' => Setting::get('default_currency_symbol', '$'),
         ]);
     }
 
@@ -64,8 +65,13 @@ class GeneralSettings extends Page implements HasForms
 
                 Forms\Components\Section::make('Branding')
                     ->schema([
-                        Forms\Components\TextInput::make('company_logo')
-                            ->label('Logo URL'),
+                        Forms\Components\FileUpload::make('company_logo')
+                            ->label('Logo')
+                            ->image()
+                            ->imageEditor()
+                            ->disk('public')
+                            ->directory('company')
+                            ->columnSpanFull(),
                         Forms\Components\Textarea::make('company_footer_text')
                             ->label('Footer text shown to clients'),
                     ])->columns(2),
@@ -73,8 +79,13 @@ class GeneralSettings extends Page implements HasForms
                 Forms\Components\Section::make('Currency')
                     ->schema([
                         Forms\Components\TextInput::make('default_currency')
-                            ->label('Default currency code')
-                            ->default('USD'),
+                            ->label('Currency Code')
+                            ->default('USD')
+                            ->maxLength(3),
+                        Forms\Components\TextInput::make('default_currency_symbol')
+                            ->label('Currency Symbol')
+                            ->default('$')
+                            ->maxLength(5),
                     ])->columns(2),
             ])
             ->statePath('data');
@@ -87,6 +98,8 @@ class GeneralSettings extends Page implements HasForms
         foreach ($data as $key => $value) {
             Setting::set($key, $value);
         }
+
+        Setting::flushCache();
 
         Notification::make()
             ->title('General settings saved')
