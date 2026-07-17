@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Setting;
 use App\Services\Servers\PterodactylServer;
 use Filament\Pages\Page;
 
@@ -16,6 +17,13 @@ class PterodactylNodes extends Page
     protected static ?string $title = 'Pterodactyl Nodes & Allocations';
 
     protected static string $view = 'filament.pages.pterodactyl-nodes';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $configs = json_decode(Setting::get('server_configurations', '[]'), true);
+
+        return collect($configs)->contains(fn ($c) => ($c['type'] ?? '') === 'pterodactyl' && ! empty($c['is_active']));
+    }
 
     public array $nodes = [];
 
