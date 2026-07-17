@@ -181,6 +181,13 @@ if ! id -u devliopay >/dev/null 2>&1; then
 fi
 print_ok "User 'devliopay' ready"
 
+print_info "Configuring PHP-FPM to run as devliopay..."
+sed -i 's/^user = www-data/user = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^group = www-data/group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^listen\.owner = www-data/listen.owner = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^listen\.group = www-data/listen.group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+print_ok "PHP-FPM configured for devliopay user"
+
 print_step 6 $TOTAL_STEPS "Cloning Repository"
 if [ -d "$INSTALL_DIR" ]; then
     rm -rf "$INSTALL_DIR"
