@@ -13,16 +13,18 @@
         <div class="space-y-4">
             @foreach($announcements as $announcement)
             <a href="{{ route('announcements.show', $announcement->slug) }}" class="glass rounded-2xl p-6 hover:border-brand-500/20 transition-all block group">
-                <div class="flex flex-col sm:flex-row sm:items-start gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-500/20 transition-colors">
-                        <i data-lucide="megaphone" class="w-5 h-5 text-brand-400"></i>
+                @if($announcement->image)
+                    <div class="mb-4 rounded-xl overflow-hidden">
+                        <img src="{{ asset('storage/' . $announcement->image) }}" alt="{{ $announcement->title }}" class="w-full h-48 object-cover">
                     </div>
+                @endif
+                <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                     <div class="flex-1 min-w-0">
                         <h2 class="text-lg font-bold group-hover:text-brand-400 transition-colors mb-1">{{ $announcement->title }}</h2>
-                        <p class="text-sm text-gray-400 line-clamp-2 mb-2">{{ Str::limit(strip_tags($announcement->body ?? $announcement->content ?? ''), 180) }}</p>
+                        <p class="text-sm text-gray-400 line-clamp-2 mb-2">{{ Str::limit(strip_tags($announcement->content ?? ''), 180) }}</p>
                         <div class="flex items-center gap-3 text-xs text-gray-500">
                             <span><i data-lucide="calendar" class="w-3 h-3 inline mr-0.5"></i>{{ $announcement->created_at->format('M j, Y') }}</span>
-                            <span><i data-lucide="user" class="w-3 h-3 inline mr-0.5"></i>{{ $announcement->author->name ?? 'Admin' }}</span>
+                            <span><i data-lucide="user" class="w-3 h-3 inline mr-0.5"></i>{{ $announcement->user->name ?? 'Admin' }}</span>
                         </div>
                     </div>
                     <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 group-hover:text-brand-400 transition-colors flex-shrink-0 mt-1"></i>
