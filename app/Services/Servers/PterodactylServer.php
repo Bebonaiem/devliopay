@@ -100,7 +100,7 @@ class PterodactylServer implements ServerInterface
             return ['success' => false, 'error' => 'No free IP:port allocations available on node '.$nodeId.'. Please add allocations in your Pterodactyl admin panel under Nodes → Settings → Allocations.'];
         }
 
-        $eggData = $this->getEgg($eggId);
+        $eggData = $this->getEgg($eggId, $nestId);
         $dockerImage = $properties['docker_image']
             ?? $settings['docker_image']
             ?? $eggData['attributes']['docker_image']
@@ -109,7 +109,7 @@ class PterodactylServer implements ServerInterface
 
         $environment = $properties['environment'] ?? [];
         if (empty($environment)) {
-            $environment = $this->getDefaultEnvironment($eggId);
+            $environment = $this->getDefaultEnvironment($eggId, $nestId);
         }
 
         $payload = [
@@ -164,9 +164,9 @@ class PterodactylServer implements ServerInterface
         return ['success' => false, 'error' => $result['error'] ?? 'Failed to create server'];
     }
 
-    private function getDefaultEnvironment(int $eggId): array
+    private function getDefaultEnvironment(int $eggId, int $nestId = 1): array
     {
-        $egg = $this->getEgg($eggId);
+        $egg = $this->getEgg($eggId, $nestId);
         $vars = $egg['attributes']['relationships']['variables']['data'] ?? [];
         $env = ['SERVER_JARFILE' => 'server.jar', 'MINECRAFT_VERSION' => 'latest', 'BUILD_NUMBER' => 'latest'];
         if (! empty($vars)) {
@@ -181,9 +181,13 @@ class PterodactylServer implements ServerInterface
         return $env;
     }
 
-    private function getEgg(int $eggId): ?array
+    private function getEgg(int $eggId, int $nestId = 1): ?array
     {
-        $result = $this->makeRequest('get', "/eggs/{$eggId}");
+        $result = $this->makeRequest('get', "/nests/{$nestId}/eggs/{$eggId}");
+
+        if (! $result['success']) {
+            $result = $this->makeRequest('get', "/eggs/{$eggId}");
+        }
 
         return $result['success'] ? ($result['data'] ?? null) : null;
     }
