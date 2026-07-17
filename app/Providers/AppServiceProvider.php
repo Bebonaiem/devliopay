@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('cartCount', $cartCount);
 
             $view->with('companyName', Setting::get('company_name', config('app.name', 'DevlioPay')));
-            $view->with('companyLogo', Setting::get('company_logo', ''));
+            $view->with('companyLogo', Setting::get('company_logo', '') ? '/storage/' . ltrim(Setting::get('company_logo', ''), '/') : '');
             $view->with('companyEmail', Setting::get('company_email', ''));
             $view->with('companyUrl', Setting::get('company_url', ''));
             $view->with('companyPhone', Setting::get('company_phone', ''));
