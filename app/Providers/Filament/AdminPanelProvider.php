@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\DevlioPayInfoWidget;
 use App\Filament\Widgets\RevenueChart;
 use App\Filament\Widgets\RevenueOverview;
 use App\Models\Setting;
@@ -44,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                DevlioPayInfoWidget::class,
                 RevenueOverview::class,
                 RevenueChart::class,
             ])
