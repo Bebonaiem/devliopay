@@ -27,7 +27,7 @@ class ProfileController extends Controller
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:255',
-            'country' => 'nullable|string|size:2',
+            'country' => 'nullable|string|max:255',
             'zip_code' => 'nullable|string|max:255',
         ]);
 

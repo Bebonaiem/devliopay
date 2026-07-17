@@ -39,6 +39,7 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Country</label>
                 <input type="text" name="country" value="{{ old('country', auth()->user()->country ?? '') }}" class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="United States">
+                @error('country') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
 
@@ -51,14 +52,17 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">City</label>
                 <input type="text" name="city" value="{{ old('city', auth()->user()->city ?? '') }}" class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20">
+                @error('city') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">State</label>
                 <input type="text" name="state" value="{{ old('state', auth()->user()->state ?? '') }}" class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20">
+                @error('state') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Zip Code</label>
                 <input type="text" name="zip_code" value="{{ old('zip_code', auth()->user()->zip_code ?? '') }}" class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20">
+                @error('zip_code') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
 
