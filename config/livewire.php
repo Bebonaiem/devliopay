@@ -8,7 +8,7 @@ return [
     'app_url' => env('APP_URL'),
     'middleware_group' => 'web',
     'temporary_file_upload' => [
-        'disk' => env('LIVEWIRE_TEMP_UPLOAD_DISK', 'local'),
+        'disk' => env('LIVEWIRE_TEMP_UPLOAD_DISK', 'public'),
         'rules' => ['required', 'file', 'max:12288'],
         'directory' => 'livewire-tmp',
     ],
