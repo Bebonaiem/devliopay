@@ -42,8 +42,8 @@
 
     {{-- Main Stats --}}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;" class="mb-6">
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="flex items-center gap-3 mb-3">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="flex items-center gap-3 mb-4">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/10">
                     <x-heroicon-o-banknotes class="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
                 </div>
@@ -52,8 +52,8 @@
             <div class="text-2xl font-bold">${{ $this->getTotalRevenue() }}</div>
         </div>
 
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="flex items-center gap-3 mb-3">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="flex items-center gap-3 mb-4">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-500/10 dark:bg-primary-500/10">
                     <x-heroicon-o-calendar class="w-5 h-5 text-primary-500 dark:text-primary-400" />
                 </div>
@@ -62,8 +62,8 @@
             <div class="text-2xl font-bold">${{ $this->getMonthlyRevenue() }}</div>
         </div>
 
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="flex items-center gap-3 mb-3">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="flex items-center gap-3 mb-4">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10 dark:bg-blue-500/10">
                     <x-heroicon-o-calculator class="w-5 h-5 text-blue-500 dark:text-blue-400" />
                 </div>
@@ -72,8 +72,8 @@
             <div class="text-2xl font-bold">${{ $this->getAvgInvoiceValue() }}</div>
         </div>
 
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="flex items-center gap-3 mb-3">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="flex items-center gap-3 mb-4">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-violet-500/10 dark:bg-violet-500/10">
                     <x-heroicon-o-arrow-trending-up class="w-5 h-5 text-violet-500 dark:text-violet-400" />
                 </div>
@@ -85,30 +85,30 @@
 
     {{-- Secondary Stats --}}
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;" class="mb-6">
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="text-xs text-gray-500 mb-1">Orders</div>
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="text-xs text-gray-500 mb-2">Orders</div>
             <div class="text-xl font-bold">{{ number_format($stats['total_orders'] ?? 0) }}</div>
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="text-xs text-gray-500 mb-1">Active Services</div>
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="text-xs text-gray-500 mb-2">Active Services</div>
             <div class="text-xl font-bold">{{ number_format($stats['active_services'] ?? 0) }}</div>
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="text-xs text-gray-500 mb-1">Total Users</div>
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="text-xs text-gray-500 mb-2">Total Users</div>
             <div class="text-xl font-bold">{{ number_format($stats['total_users'] ?? 0) }}</div>
             @if(($stats['new_users'] ?? 0) > 0)
-                <div class="text-xs text-emerald-500 mt-0.5">+{{ $stats['new_users'] }} new</div>
+                <div class="text-xs text-emerald-500 mt-1">+{{ $stats['new_users'] }} new</div>
             @endif
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="text-xs text-gray-500 mb-1">Pending</div>
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="text-xs text-gray-500 mb-2">Pending</div>
             <div class="text-xl font-bold">{{ number_format($stats['pending_invoices'] ?? 0) }}</div>
             @if(($stats['overdue_invoices'] ?? 0) > 0)
-                <div class="text-xs text-red-500 mt-0.5">{{ $stats['overdue_invoices'] }} overdue</div>
+                <div class="text-xs text-red-500 mt-1">{{ $stats['overdue_invoices'] }} overdue</div>
             @endif
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="text-xs text-gray-500 mb-1">Total Services</div>
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+            <div class="text-xs text-gray-500 mb-2">Total Services</div>
             <div class="text-xl font-bold">{{ number_format($stats['total_services'] ?? 0) }}</div>
         </div>
     </div>
