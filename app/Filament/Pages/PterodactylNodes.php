@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Setting;
 use App\Services\Servers\PterodactylServer;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Cache;
 
 class PterodactylNodes extends Page
 {
@@ -50,16 +51,30 @@ class PterodactylNodes extends Page
     {
         $this->error = '';
 
+        $cacheKey = 'pterodactyl_nodes_allocations';
+
         try {
-            $pterodactyl = new PterodactylServer();
+            $data = Cache::remember($cacheKey, 300, function () {
+                $pterodactyl = new PterodactylServer();
 
-            $nodesResult = $this->fetchNodes($pterodactyl);
-            $this->nodes = $nodesResult;
+                $nodes = $this->fetchNodes($pterodactyl);
+                $allocations = $this->fetchAllAllocations($pterodactyl, $nodes);
 
-            $this->allocations = $this->fetchAllAllocations($pterodactyl, $nodesResult);
+                return compact('nodes', 'allocations');
+            });
+
+            $this->nodes = $data['nodes'];
+            $this->allocations = $data['allocations'];
         } catch (\Exception $e) {
+            Cache::forget($cacheKey);
             $this->error = 'Failed to connect to Pterodactyl panel: '.$e->getMessage();
         }
+    }
+
+    public function refreshData(): void
+    {
+        Cache::forget('pterodactyl_nodes_allocations');
+        $this->loadData();
     }
 
     public function updatedFilterNode(): void

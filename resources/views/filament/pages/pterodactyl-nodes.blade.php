@@ -86,7 +86,7 @@
             </x-slot>
 
             <x-slot name="headerActions">
-                <x-filament::button wire:click="loadData" color="gray" size="sm">
+            <x-filament::button wire:click="refreshData" color="gray" size="sm">
                     <x-heroicon-o-arrow-path class="w-4 h-4" />
                 </x-filament::button>
             </x-slot>
