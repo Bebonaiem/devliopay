@@ -10,6 +10,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 print_banner() {
@@ -21,111 +22,180 @@ print_banner() {
     echo "██████╔╝███████╗ ╚████╔╝ ███████╗██║╚██████╔╝██║     ██║  ██║   ██║   "
     echo "╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚═╝  ╚═╝   ╚═╝   "
     echo -e "${NC}"
-    echo -e "  ${CYAN}Automatic Installation Script for Ubuntu${NC}"
+    echo -e "  ${CYAN}${BOLD}Automatic Installation Script for Ubuntu${NC}"
     echo ""
 }
 
-# ─── Configuration ─────────────────────────────────────────────────────────────
-DOMAIN="${1:-}"
+print_step() {
+    echo ""
+    echo -e "${YELLOW}${BOLD}[$1/$2] $3${NC}"
+}
 
-# Prompt for domain or IP
-if [ -z "$DOMAIN" ]; then
-    echo -e "${CYAN}Enter your domain name or server IP (e.g. devliopay.com or 123.45.67.89):${NC}"
-    read -r DOMAIN
-fi
-DOMAIN="${DOMAIN:-localhost}"
+print_ok() {
+    echo -e "  ${GREEN}✓${NC} $1"
+}
 
-# Detect if input is an IP address or a domain
-IS_IP=false
-if echo "$DOMAIN" | grep -qE '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
-    IS_IP=true
-fi
+print_error() {
+    echo -e "  ${RED}✗${NC} $1"
+}
 
-INSTALL_DIR="/var/www/devliopay"
+print_info() {
+    echo -e "  ${CYAN}→${NC} $1"
+}
 
-# Prompt for admin details
-echo -e "${CYAN}Enter admin name:${NC}"
-read -r ADMIN_NAME
-ADMIN_NAME="${ADMIN_NAME:-Admin}"
+# ─── Interactive Setup Menu ────────────────────────────────────────────────────
+setup_config() {
+    echo ""
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}  ${CYAN}Installation Type${NC}"
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  ${CYAN}1)${NC} Use Server IP address"
+    echo -e "  ${CYAN}2)${NC} Use Domain name"
+    echo ""
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    read -rp "  Choose [1-2]: " INSTALL_TYPE
 
-echo -e "${CYAN}Enter admin email:${NC}"
-read -r ADMIN_EMAIL
-ADMIN_EMAIL="${ADMIN_EMAIL:-admin@${DOMAIN}}"
+    case "$INSTALL_TYPE" in
+        1)
+            echo ""
+            read -rp "  Enter your server IP (e.g. 123.45.67.89): " DOMAIN
+            IS_IP=true
+            ;;
+        2)
+            echo ""
+            read -rp "  Enter your domain (e.g. devliopay.com): " DOMAIN
+            IS_IP=false
+            ;;
+        *)
+            echo -e "${RED}Invalid choice. Exiting.${NC}"
+            exit 1
+            ;;
+    esac
 
-echo -e "${CYAN}Enter admin password:${NC}"
-read -rs ADMIN_PASSWORD
-echo ""
-ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(openssl rand -base64 12)}"
+    DOMAIN="${DOMAIN:-localhost}"
+    INSTALL_DIR="/var/www/devliopay"
 
-DB_PASSWORD=$(openssl rand -base64 32)
+    echo ""
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}  ${CYAN}Admin Account Setup${NC}"
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    read -rp "  Admin name [Admin]: " ADMIN_NAME
+    ADMIN_NAME="${ADMIN_NAME:-Admin}"
+
+    read -rp "  Admin email [admin@${DOMAIN}]: " ADMIN_EMAIL
+    ADMIN_EMAIL="${ADMIN_EMAIL:-admin@${DOMAIN}}"
+
+    echo -n "  Admin password: "
+    read -rs ADMIN_PASSWORD
+    echo ""
+    if [ -z "$ADMIN_PASSWORD" ]; then
+        ADMIN_PASSWORD=$(openssl rand -base64 12)
+        echo -e "  ${CYAN}→ Generated: ${ADMIN_PASSWORD}${NC}"
+    fi
+
+    DB_PASSWORD=$(openssl rand -base64 32)
+
+    echo ""
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}  ${CYAN}Installation Summary${NC}"
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  ${CYAN}URL:${NC}      http://${DOMAIN}"
+    echo -e "  ${CYAN}Admin:${NC}    ${ADMIN_EMAIL}"
+    echo -e "  ${CYAN}Password:${NC} ${ADMIN_PASSWORD}"
+    echo ""
+    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    read -rp "  Proceed with installation? [Y/n]: " CONFIRM
+    if [[ "$CONFIRM" =~ ^[nN]$ ]]; then
+        echo -e "${RED}Installation cancelled.${NC}"
+        exit 0
+    fi
+    echo ""
+}
 
 print_banner
+setup_config
 
-echo -e "${YELLOW}[1/12] System Update & Dependencies${NC}"
+# ─── Installation ──────────────────────────────────────────────────────────────
+TOTAL_STEPS=12
+
+print_step 1 $TOTAL_STEPS "System Update & Dependencies"
 apt-get update -y
 apt-get upgrade -y
 apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3 certbot python3-certbot-nginx
+print_ok "System packages installed"
 
-echo -e "${YELLOW}[2/12] Installing PHP 8.3+ & Extensions${NC}"
+print_step 2 $TOTAL_STEPS "Installing PHP 8.3+ & Extensions"
 add-apt-repository -y ppa:ondrej/php
 apt-get update -y
 apt-get install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-gd php8.3-sqlite3 php8.3-intl php8.3-tokenizer php8.3-dom php8.3-fileinfo php8.3-redis php8.3-fpm
+print_ok "PHP 8.3 installed"
 
-echo -e "${YELLOW}[3/12] Installing Node.js 22.x & npm${NC}"
+print_step 3 $TOTAL_STEPS "Installing Node.js 22.x & npm"
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt-get install -y nodejs
+print_ok "Node.js $(node -v) installed"
 
-echo -e "${YELLOW}[4/12] Installing Composer${NC}"
+print_step 4 $TOTAL_STEPS "Installing Composer"
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+print_ok "Composer $(composer -V | head -1) installed"
 
-echo -e "${YELLOW}[5/12] Setting up Web Server User${NC}"
+print_step 5 $TOTAL_STEPS "Setting up Web Server User"
 if ! id -g devliopay >/dev/null 2>&1; then
     addgroup --system devliopay
 fi
 if ! id -u devliopay >/dev/null 2>&1; then
     adduser --system --ingroup devliopay --home $INSTALL_DIR --shell /bin/bash devliopay
 fi
+print_ok "User 'devliopay' ready"
 
-echo -e "${YELLOW}[6/12] Cloning Repository${NC}"
+print_step 6 $TOTAL_STEPS "Cloning Repository"
 if [ -d "$INSTALL_DIR" ]; then
     rm -rf "$INSTALL_DIR"
 fi
 git clone https://github.com/Bebonaiem/devliopay.git "$INSTALL_DIR"
 cd "$INSTALL_DIR"
-
-# Set ownership before composer/npm so they can write files
 chown -R devliopay:devliopay "$INSTALL_DIR"
 git config --global --add safe.directory "$INSTALL_DIR"
+print_ok "Repository cloned to ${INSTALL_DIR}"
 
-echo -e "${YELLOW}[7/12] Installing PHP Dependencies${NC}"
+print_step 7 $TOTAL_STEPS "Installing PHP Dependencies"
 sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction
+print_ok "Composer packages installed"
 
-echo -e "${YELLOW}[8/12] Installing Node Dependencies & Building Assets${NC}"
+print_step 8 $TOTAL_STEPS "Installing Node Dependencies & Building Assets"
 sudo -u devliopay npm install
 sudo -u devliopay npm run build
+print_ok "Frontend assets built"
 
-echo -e "${YELLOW}[9/12] Environment Configuration${NC}"
+print_step 9 $TOTAL_STEPS "Environment Configuration"
 cp .env.example .env
-
-# Generate app key
 php artisan key:generate --force --no-interaction
-
-# Configure database
 touch database/database.sqlite
 chmod 664 database/database.sqlite
 chown devliopay:devliopay database/database.sqlite
 
-# Update .env
+if [ "$IS_IP" = true ]; then
+    APP_URL="http://${DOMAIN}"
+else
+    APP_URL="http://${DOMAIN}"
+fi
+
 sed -i "s|APP_URL=http://localhost|APP_URL=${APP_URL}|g" .env
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
 sed -i "s|MAIL_MAILER=log|MAIL_MAILER=smtp|g" .env
+print_ok "Environment configured"
 
-echo -e "${YELLOW}[10/12] Database Migration & Seeding${NC}"
+print_step 10 $TOTAL_STEPS "Database Migration & Seeding"
 php artisan migrate --force --no-interaction
 php artisan db:seed --force --no-interaction
+print_ok "Database migrated and seeded"
 
-echo -e "${YELLOW}[11/12] Creating Admin User${NC}"
+print_step 11 $TOTAL_STEPS "Creating Admin User"
 php artisan tinker --execute="
 \$user = App\Models\User::create([
     'name' => '${ADMIN_NAME}',
@@ -136,29 +206,26 @@ php artisan tinker --execute="
 ]);
 echo 'Admin user created: ' . \$user->email;
 " 2>&1
+print_ok "Admin user created: ${ADMIN_EMAIL}"
 
-echo -e "${YELLOW}[12/12] Permissions & Cache${NC}"
+print_step 12 $TOTAL_STEPS "Permissions, Cache & Nginx"
 chown -R devliopay:devliopay "$INSTALL_DIR"
 chmod -R 755 "$INSTALL_DIR"
 chmod -R 775 "$INSTALL_DIR/storage" 2>/dev/null || true
 chmod -R 775 "$INSTALL_DIR/bootstrap/cache" 2>/dev/null || true
 
-# Create storage link
 php artisan storage:link --force --no-interaction
-
-# Clear and cache
 php artisan config:cache --no-interaction
 php artisan route:cache --no-interaction
 php artisan view:cache --no-interaction
 php artisan icon:cache --no-interaction 2>/dev/null || true
+print_ok "Permissions set and cache cleared"
 
 # ─── Nginx Configuration ──────────────────────────────────────────────────────
-echo -e "${YELLOW}Setting up Nginx...${NC}"
+print_info "Configuring Nginx..."
 
-# Detect PHP-FPM socket
 PHP_FPM_SOCK=$(find /var/run/php -name "php*-fpm.sock" 2>/dev/null | head -1)
 if [ -z "$PHP_FPM_SOCK" ]; then
-    # Ensure php-fpm is installed and started
     apt-get install -y php8.3-fpm 2>/dev/null || true
     systemctl start php8.3-fpm 2>/dev/null || true
     PHP_FPM_SOCK=$(find /var/run/php -name "php*-fpm.sock" 2>/dev/null | head -1)
@@ -166,15 +233,11 @@ fi
 if [ -z "$PHP_FPM_SOCK" ]; then
     PHP_FPM_SOCK="/var/run/php/php8.3-fpm.sock"
 fi
-echo -e "${CYAN}Using PHP-FPM socket: ${PHP_FPM_SOCK}${NC}"
 
-# For IPs, use _ to match all requests; for domains use the actual domain
 if [ "$IS_IP" = true ]; then
     NGINX_SERVER_NAME="_"
-    APP_URL="http://${DOMAIN}"
 else
     NGINX_SERVER_NAME="${DOMAIN}"
-    APP_URL="http://${DOMAIN}"
 fi
 
 cat > /etc/nginx/sites-available/devliopay <<NGINX
@@ -218,12 +281,14 @@ NGINX
 ln -sf /etc/nginx/sites-available/devliopay /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 
-# Restart services
 PHP_FPM_VERSION=$(echo "$PHP_FPM_SOCK" | sed -E 's|.*php([0-9.]+)-fpm.*|\1|')
 systemctl restart "php${PHP_FPM_VERSION}-fpm" 2>/dev/null || systemctl restart php8.3-fpm 2>/dev/null || true
 systemctl restart nginx
+print_ok "Nginx configured and running"
 
-# ─── Setup Queue Worker (systemd) ─────────────────────────────────────────────
+# ─── Queue Worker ──────────────────────────────────────────────────────────────
+print_info "Setting up queue worker..."
+
 cat > /etc/systemd/system/devliopay-worker.service <<SYSTEMD
 [Unit]
 Description=DevlioPay Queue Worker
@@ -244,21 +309,26 @@ SYSTEMD
 systemctl daemon-reload
 systemctl enable devliopay-worker
 systemctl start devliopay-worker
+print_ok "Queue worker running"
 
-# ─── Setup Scheduler (cron) ──────────────────────────────────────────────────
+# ─── Scheduler ────────────────────────────────────────────────────────────────
+print_info "Setting up scheduler..."
 CRON_LINE="* * * * * cd ${INSTALL_DIR} && php artisan schedule:run >> /dev/null 2>&1"
 (crontab -l 2>/dev/null | grep -v "artisan schedule:run" ; echo "$CRON_LINE") | crontab -
+print_ok "Scheduler configured"
 
-# ─── SSL Certificate (optional) ──────────────────────────────────────────────
+# ─── SSL ───────────────────────────────────────────────────────────────────────
 if [ "$IS_IP" = false ] && [ "$DOMAIN" != "localhost" ]; then
-    echo -e "${YELLOW}Setting up SSL certificate...${NC}"
+    print_info "Setting up SSL certificate..."
     certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "admin@${DOMAIN}" || true
+    print_ok "SSL configured"
 fi
 
+# ─── Done ──────────────────────────────────────────────────────────────────────
 echo ""
-echo -e "${GREEN}============================================================${NC}"
-echo -e "${GREEN}  DevlioPay Installation Complete!${NC}"
-echo -e "${GREEN}============================================================${NC}"
+echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║            ${BOLD}DevlioPay Installed Successfully!${NC}${GREEN}               ║${NC}"
+echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "  ${CYAN}URL:${NC}       ${APP_URL}"
 echo -e "  ${CYAN}Admin:${NC}     ${ADMIN_EMAIL}"
