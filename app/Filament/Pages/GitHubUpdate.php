@@ -54,15 +54,14 @@ class GitHubUpdate extends Page
         $base = base_path();
 
         $steps = [
-            ['label' => 'Pulling from GitHub...', 'cmd' => "git -C {$base} pull origin {$this->currentBranch} 2>&1"],
-            ['label' => 'Installing PHP dependencies...', 'cmd' => "cd {$base} && composer install --no-dev --optimize-autoloader --no-interaction 2>&1"],
-            ['label' => 'Installing Node dependencies...', 'cmd' => "cd {$base} && npm install 2>&1"],
-            ['label' => 'Building frontend assets...', 'cmd' => "cd {$base} && npm run build 2>&1"],
-            ['label' => 'Running migrations...', 'cmd' => "cd {$base} && php artisan migrate --force --no-interaction 2>&1"],
-            ['label' => 'Clearing config cache...', 'cmd' => "cd {$base} && php artisan config:clear 2>&1"],
-            ['label' => 'Caching routes...', 'cmd' => "cd {$base} && php artisan route:cache 2>&1"],
-            ['label' => 'Caching views...', 'cmd' => "cd {$base} && php artisan view:cache 2>&1"],
-            ['label' => 'Fixing permissions...', 'cmd' => "chown -R devliopay:devliopay {$base} 2>&1"],
+            ['label' => 'Pulling from GitHub...', 'cmd' => "git -C {$base} pull origin {$this->currentBranch} 2>&1", 'required' => true],
+            ['label' => 'Installing PHP dependencies...', 'cmd' => "cd {$base} && composer install --no-dev --optimize-autoloader --no-interaction 2>&1", 'required' => true],
+            ['label' => 'Installing Node dependencies...', 'cmd' => "cd {$base} && npm install 2>&1", 'required' => false],
+            ['label' => 'Building frontend assets...', 'cmd' => "cd {$base} && npm run build 2>&1", 'required' => false],
+            ['label' => 'Running migrations...', 'cmd' => "cd {$base} && php artisan migrate --force --no-interaction 2>&1", 'required' => true],
+            ['label' => 'Clearing caches...', 'cmd' => "cd {$base} && php artisan config:clear && php artisan route:clear && php artisan view:clear 2>&1", 'required' => true],
+            ['label' => 'Caching routes...', 'cmd' => "cd {$base} && php artisan route:cache 2>&1", 'required' => true],
+            ['label' => 'Caching views...', 'cmd' => "cd {$base} && php artisan view:cache 2>&1", 'required' => true],
         ];
 
         foreach ($steps as $step) {
@@ -70,12 +69,16 @@ class GitHubUpdate extends Page
             $status = $result->successful() ? 'OK' : 'FAILED';
             $this->updateOutput .= "[{$status}] {$step['label']}\n";
 
-            if ($result->successful() && trim($result->output())) {
-                $this->updateOutput .= $result->output() . "\n";
+            $output = trim($result->output());
+            $errors = trim($result->errorOutput());
+            $combined = trim($output . "\n" . $errors);
+
+            if ($combined) {
+                $this->updateOutput .= $combined . "\n";
             }
 
-            if (!$result->successful()) {
-                $this->updateOutput .= $result->errorOutput() . "\n";
+            if (!$result->successful() && ($step['required'] ?? true)) {
+                $this->updateOutput .= "\nUpdate aborted due to critical failure.\n";
                 break;
             }
 
