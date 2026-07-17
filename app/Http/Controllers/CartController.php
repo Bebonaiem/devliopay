@@ -80,15 +80,11 @@ class CartController extends Controller
         $quantity = max(1, (int) ($request->quantity ?? 1));
 
         if (isset($cart[$key])) {
-            if ($product && $product->allow_quantity === 'no') {
-                return redirect()->route('cart.index')
-                    ->with('error', 'This item is already in your cart.');
-            }
-
             if ($product && $product->allow_quantity === 'separated') {
                 $cart[$key]['quantity'] = $quantity;
             } else {
-                $cart[$key]['quantity'] += $quantity;
+                return redirect()->route('cart.index')
+                    ->with('error', 'This item is already in your cart.');
             }
             $cart[$key]['currency_id'] = $request->currency_id ?? null;
         } else {
@@ -255,19 +251,16 @@ class CartController extends Controller
             $order->load('items.product', 'items.pricing');
             foreach ($order->items as $item) {
                 $product = $item->product;
-                $qty = $item->quantity ?? 1;
-                for ($i = 0; $i < $qty; $i++) {
-                    $service = Service::create([
-                        'user_id' => $user->id,
-                        'product_id' => $item->product_id,
-                        'pricing_id' => $item->pricing_id,
-                        'order_id' => $order->id,
-                        'status' => 'pending',
-                        'config_options' => $item->config_options,
-                        'server_extension' => $product?->server_extension ?? null,
-                    ]);
-                    $serviceIds[] = $service->id;
-                }
+                $service = Service::create([
+                    'user_id' => $user->id,
+                    'product_id' => $item->product_id,
+                    'pricing_id' => $item->pricing_id,
+                    'order_id' => $order->id,
+                    'status' => 'pending',
+                    'config_options' => $item->config_options,
+                    'server_extension' => $product?->server_extension ?? null,
+                ]);
+                $serviceIds[] = $service->id;
             }
 
             if (! empty($serviceIds) && ! $invoice->service_id) {
