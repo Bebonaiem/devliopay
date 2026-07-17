@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Addon;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Services\ActivityLogService;
@@ -58,7 +59,13 @@ class ServiceController extends Controller
             $panelUrl = rtrim(Setting::get('pterodactyl_host', ''), '/').'/server/'.($service->server_properties['identifier'] ?? $service->server_properties['server_id']);
         }
 
-        return view('client.services.show', compact('service', 'panelUrl'));
+        $availableAddons = Addon::where('is_active', true)
+            ->where('category_id', $service->product->category_id ?? null)
+            ->whereNotIn('id', $service->addons->pluck('addon_id'))
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('client.services.show', compact('service', 'panelUrl', 'availableAddons'));
     }
 
     public function status(Service $service)
@@ -128,5 +135,36 @@ class ServiceController extends Controller
 
         return redirect()->route('client.services.show', $service)
             ->with('success', 'Service will be cancelled at the end of the billing period');
+    }
+
+    public function purchaseAddon(Request $request, Service $service)
+    {
+        $this->authorize('update', $service);
+
+        $request->validate([
+            'addon_id' => 'required|exists:addons,id',
+        ]);
+
+        $addon = \App\Models\Addon::findOrFail($request->addon_id);
+
+        if (!$addon->is_active) {
+            return back()->with('error', 'This addon is no longer available');
+        }
+
+        if ($service->addons()->where('addon_id', $addon->id)->exists()) {
+            return back()->with('error', 'You already have this addon');
+        }
+
+        $service->addons()->attach($addon->id, [
+            'price' => $addon->price,
+            'status' => 'active',
+            'activated_at' => now(),
+            'next_billing_at' => $addon->billing_period ? now()->addUnit($addon->billing_period, $addon->billing_interval) : null,
+        ]);
+
+        ActivityLogService::log('addon_purchased', $service, 'Client purchased addon: '.$addon->name);
+
+        return redirect()->route('client.services.show', $service)
+            ->with('success', 'Addon "'.$addon->name.'" has been added to your service');
     }
 }

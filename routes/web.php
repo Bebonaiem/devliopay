@@ -106,6 +106,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
         Route::get('/services/{service}/status', [ServiceController::class, 'status'])->name('services.status');
         Route::post('/services/{service}/cancel', [ServiceController::class, 'cancel'])->name('services.cancel');
+        Route::post('/services/{service}/addon', [ServiceController::class, 'purchaseAddon'])->name('services.purchase-addon');
 
         // Upgrades
         Route::get('/services/{service}/upgrade', [UpgradeController::class, 'index'])->name('upgrades.index');

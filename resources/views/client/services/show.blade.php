@@ -114,6 +114,51 @@
                 </div>
             </div>
 
+            {{-- Available Addons --}}
+            @if(isset($availableAddons) && count($availableAddons) > 0)
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-sm font-semibold mb-4">Available Addons</h2>
+                <div class="space-y-3">
+                    @foreach($availableAddons as $addon)
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium">{{ $addon->name }}</p>
+                            <p class="text-xs text-gray-500">{{ $addon->description ?? $addon->billing_interval }}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($addon->price, 2) }}<span class="text-gray-500 font-normal text-xs">/{{ $addon->billing_interval }}</span></span>
+                            <form method="POST" action="{{ route('client.services.purchase-addon', $service->id) }}">
+                                @csrf
+                                <input type="hidden" name="addon_id" value="{{ $addon->id }}">
+                                <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-400 bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/20 transition-all">
+                                    Add
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- Active Addons --}}
+            @if($service->addons && count($service->addons) > 0)
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-sm font-semibold mb-4">Active Addons</h2>
+                <div class="space-y-3">
+                    @foreach($service->addons as $addon)
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium">{{ $addon->name }}</p>
+                            <p class="text-xs text-gray-500">{{ $addon->pivot->status ?? 'active' }}</p>
+                        </div>
+                        <span class="text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($addon->pivot->price ?? $addon->price, 2) }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             {{-- Danger Zone --}}
             @if(!in_array($service->status, ['cancelled', 'terminated']))
             <div class="glass rounded-2xl p-6 border border-red-500/10" x-data="{ cancelStep: 'none' }">

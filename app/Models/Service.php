@@ -97,6 +97,13 @@ class Service extends Model
         return $this->hasMany(TicketThread::class);
     }
 
+    public function addons(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Addon::class, 'service_addons')
+            ->withPivot(['price', 'status', 'activated_at', 'next_billing_at'])
+            ->withTimestamps();
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';
