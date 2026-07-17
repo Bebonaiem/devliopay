@@ -104,7 +104,8 @@ class AddonResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->minValue(0),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->visible(fn (Forms\Get $get) => $get('server_extension') === 'pterodactyl'),
 
                 Forms\Components\Section::make('Settings')
                     ->schema([
@@ -114,6 +115,7 @@ class AddonResource extends Resource
                                 'pterodactyl' => 'Pterodactyl',
                             ])
                             ->nullable()
+                            ->live()
                             ->helperText('Limit this addon to a specific server extension'),
                         Forms\Components\Toggle::make('is_active')
                             ->default(true),
