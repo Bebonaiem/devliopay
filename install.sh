@@ -280,7 +280,6 @@ sudo -u devliopay mkdir -p storage/logs storage/framework/views storage/framewor
 
 # Clear and build cache AS devliopay user
 sudo -u devliopay php artisan storage:link --force --no-interaction
-sudo -u devliopay php artisan config:cache --no-interaction
 sudo -u devliopay php artisan route:cache --no-interaction
 sudo -u devliopay php artisan view:cache --no-interaction
 sudo -u devliopay php artisan icon:cache --no-interaction 2>/dev/null || true
