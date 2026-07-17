@@ -49,7 +49,7 @@
                         <input type="password" name="password" required class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="Enter your password">
                         @error('password') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    <button type="submit" onclick="return confirm('Are you sure you want to disable two-factor authentication? Your account will be less secure.')" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/20 transition-all inline-flex items-center gap-2">
+                    <button type="button" onclick="showConfirm({title: 'Disable 2FA', message: 'Are you sure you want to disable two-factor authentication? Your account will be less secure.', type: 'danger', confirmText: 'Disable 2FA', callback: function() { document.getElementById('disable-2fa-form').submit(); }})" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/20 transition-all inline-flex items-center gap-2">
                         <i data-lucide="shield-off" class="w-3.5 h-3.5"></i> Disable 2FA
                     </button>
                 </div>
