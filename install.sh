@@ -43,6 +43,31 @@ print_info() {
     echo -e "  ${CYAN}→${NC} $1"
 }
 
+# ─── Self-download if piped ───────────────────────────────────────────────────
+if [ ! -t 0 ]; then
+    echo -e "${CYAN}Downloading installer to /tmp/install-devliopay.sh...${NC}"
+    curl -sL "https://raw.githubusercontent.com/Bebonaiem/devliopay/master/install.sh" -o /tmp/install-devliopay.sh
+    chmod +x /tmp/install-devliopay.sh
+    exec bash /tmp/install-devliopay.sh
+fi
+
+print_step() {
+    echo ""
+    echo -e "${YELLOW}${BOLD}[$1/$2] $3${NC}"
+}
+
+print_ok() {
+    echo -e "  ${GREEN}✓${NC} $1"
+}
+
+print_error() {
+    echo -e "  ${RED}✗${NC} $1"
+}
+
+print_info() {
+    echo -e "  ${CYAN}→${NC} $1"
+}
+
 # ─── Interactive Setup Menu ────────────────────────────────────────────────────
 setup_config() {
     echo ""
@@ -54,17 +79,17 @@ setup_config() {
     echo -e "  ${CYAN}2)${NC} Use Domain name"
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
-    read -rp "  Choose [1-2]: " INSTALL_TYPE < /dev/tty
+    read -rp "  Choose [1-2]: " INSTALL_TYPE
 
     case "$INSTALL_TYPE" in
         1)
             echo ""
-            read -rp "  Enter your server IP (e.g. 123.45.67.89): " DOMAIN < /dev/tty
+            read -rp "  Enter your server IP (e.g. 123.45.67.89): " DOMAIN
             IS_IP=true
             ;;
         2)
             echo ""
-            read -rp "  Enter your domain (e.g. devliopay.com): " DOMAIN < /dev/tty
+            read -rp "  Enter your domain (e.g. devliopay.com): " DOMAIN
             IS_IP=false
             ;;
         *)
@@ -81,14 +106,14 @@ setup_config() {
     echo -e "${BOLD}  ${CYAN}Admin Account Setup${NC}"
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    read -rp "  Admin name [Admin]: " ADMIN_NAME < /dev/tty
+    read -rp "  Admin name [Admin]: " ADMIN_NAME
     ADMIN_NAME="${ADMIN_NAME:-Admin}"
 
-    read -rp "  Admin email [admin@${DOMAIN}]: " ADMIN_EMAIL < /dev/tty
+    read -rp "  Admin email [admin@${DOMAIN}]: " ADMIN_EMAIL
     ADMIN_EMAIL="${ADMIN_EMAIL:-admin@${DOMAIN}}"
 
     echo -n "  Admin password: "
-    read -rs ADMIN_PASSWORD < /dev/tty
+    read -rs ADMIN_PASSWORD
     echo ""
     if [ -z "$ADMIN_PASSWORD" ]; then
         ADMIN_PASSWORD=$(openssl rand -base64 12)
@@ -108,7 +133,7 @@ setup_config() {
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    read -rp "  Proceed with installation? [Y/n]: " CONFIRM < /dev/tty
+    read -rp "  Proceed with installation? [Y/n]: " CONFIRM
     if [[ "$CONFIRM" =~ ^[nN]$ ]]; then
         echo -e "${RED}Installation cancelled.${NC}"
         exit 0
