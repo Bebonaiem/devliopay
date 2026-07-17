@@ -48,11 +48,59 @@ class CurrencyRates extends Page implements HasForms
             ->schema([
                 Forms\Components\Section::make('Base Currency')
                     ->schema([
-                        Forms\Components\TextInput::make('base_currency_code')
-                            ->label('Base Currency Code')
+                        Forms\Components\Select::make('base_currency_code')
+                            ->label('Base Currency')
+                            ->options([
+                                'USD' => 'USD ($)',
+                                'EUR' => 'EUR (€)',
+                                'GBP' => 'GBP (£)',
+                                'CAD' => 'CAD (C$)',
+                                'AUD' => 'AUD (A$)',
+                                'BRL' => 'BRL (R$)',
+                                'INR' => 'INR (₹)',
+                                'JPY' => 'JPY (¥)',
+                                'CNY' => 'CNY (¥)',
+                                'KRW' => 'KRW (₩)',
+                                'RUB' => 'RUB (₽)',
+                                'TRY' => 'TRY (₺)',
+                                'MXN' => 'MXN (MX$)',
+                                'SEK' => 'SEK (kr)',
+                                'NOK' => 'NOK (kr)',
+                                'DKK' => 'DKK (kr)',
+                                'PLN' => 'PLN (zł)',
+                                'CHF' => 'CHF (CHF)',
+                                'ZAR' => 'ZAR (R)',
+                                'NGN' => 'NGN (₦)',
+                                'PHP' => 'PHP (₱)',
+                                'IDR' => 'IDR (Rp)',
+                                'MYR' => 'MYR (RM)',
+                                'THB' => 'THB (฿)',
+                                'AED' => 'AED (د.إ)',
+                                'SAR' => 'SAR (﷼)',
+                                'QAR' => 'QAR (﷼)',
+                                'PKR' => 'PKR (₨)',
+                                'BDT' => 'BDT (৳)',
+                                'EGP' => 'EGP (E£)',
+                                'VND' => 'VND (₫)',
+                                'TWD' => 'TWD (NT$)',
+                                'HKD' => 'HKD (HK$)',
+                                'SGD' => 'SGD (S$)',
+                                'NZD' => 'NZD (NZ$)',
+                                'CLP' => 'CLP (CL$)',
+                                'COP' => 'COP (COL$)',
+                                'ARS' => 'ARS (AR$)',
+                                'PEN' => 'PEN (S/)',
+                                'UAH' => 'UAH (₴)',
+                                'CZK' => 'CZK (Kč)',
+                                'HUF' => 'HUF (Ft)',
+                                'RON' => 'RON (lei)',
+                                'BGN' => 'BGN (лв)',
+                                'HRK' => 'HRK (kn)',
+                                'ISK' => 'ISK (kr)',
+                            ])
                             ->default('USD')
                             ->required()
-                            ->maxLength(3),
+                            ->searchable(),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Exchange Rates')
