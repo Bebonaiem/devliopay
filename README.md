@@ -51,7 +51,8 @@
 
 ```bash
 # Download and run the auto-installer
-curl -sL https://raw.githubusercontent.com/Bebonaiem/devliopay/master/install.sh | sudo bash
+curl -sL https://raw.githubusercontent.com/Bebonaiem/devliopay/master/install.sh -o /tmp/install-devliopay.sh
+sudo bash /tmp/install-devliopay.sh
 ```
 
 This will automatically install PHP 8.4, Node.js 22, Composer, Nginx, SQLite, configure everything, set up SSL with Let's Encrypt, and print your admin credentials.
