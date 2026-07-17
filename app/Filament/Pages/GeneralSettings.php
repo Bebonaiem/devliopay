@@ -31,7 +31,7 @@ class GeneralSettings extends Page implements HasForms
         $this->form->fill([
             'company_name' => Setting::get('company_name', config('app.name', 'DevlioPay')),
             'company_email' => Setting::get('company_email', ''),
-            'company_url' => Setting::get('company_url', url('/')),
+            'company_url' => Setting::get('company_url') ?: url('/'),
             'company_phone' => Setting::get('company_phone', ''),
             'company_address' => Setting::get('company_address', ''),
             'company_logo' => Setting::get('company_logo', ''),
