@@ -162,14 +162,5 @@ class GeneralSettings extends Page implements HasForms
         }
 
         file_put_contents($envFile, $content);
-
-        putenv("APP_URL={$url}");
-        $_ENV['APP_URL'] = $url;
-        config(['app.url' => $url]);
-
-        $domain = parse_url($url, PHP_URL_HOST) ?? '';
-        putenv("APP_DOMAIN={$domain}");
-        $_ENV['APP_DOMAIN'] = $domain;
-        config(['app.domain' => $domain]);
     }
 }
