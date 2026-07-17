@@ -85,29 +85,29 @@
 
     {{-- Secondary Stats --}}
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;" class="mb-6">
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
             <div class="text-xs text-gray-500 mb-2">Orders</div>
             <div class="text-xl font-bold">{{ number_format($stats['total_orders'] ?? 0) }}</div>
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
             <div class="text-xs text-gray-500 mb-2">Active Services</div>
             <div class="text-xl font-bold">{{ number_format($stats['active_services'] ?? 0) }}</div>
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
             <div class="text-xs text-gray-500 mb-2">Total Users</div>
             <div class="text-xl font-bold">{{ number_format($stats['total_users'] ?? 0) }}</div>
             @if(($stats['new_users'] ?? 0) > 0)
                 <div class="text-xs text-emerald-500 mt-1">+{{ $stats['new_users'] }} new</div>
             @endif
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
             <div class="text-xs text-gray-500 mb-2">Pending</div>
             <div class="text-xl font-bold">{{ number_format($stats['pending_invoices'] ?? 0) }}</div>
             @if(($stats['overdue_invoices'] ?? 0) > 0)
                 <div class="text-xs text-red-500 mt-1">{{ $stats['overdue_invoices'] }} overdue</div>
             @endif
         </div>
-        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+        <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
             <div class="text-xs text-gray-500 mb-2">Total Services</div>
             <div class="text-xl font-bold">{{ number_format($stats['total_services'] ?? 0) }}</div>
         </div>
