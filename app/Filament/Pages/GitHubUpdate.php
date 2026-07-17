@@ -57,7 +57,7 @@ class GitHubUpdate extends Page
             ['label' => 'Pulling from GitHub...', 'cmd' => "git -C {$base} pull origin {$this->currentBranch} 2>&1", 'required' => true],
             ['label' => 'Installing PHP dependencies...', 'cmd' => "cd {$base} && composer install --no-dev --optimize-autoloader --no-interaction 2>&1", 'required' => true],
             ['label' => 'Installing Node dependencies...', 'cmd' => "cd {$base} && npm install 2>&1", 'required' => false],
-            ['label' => 'Building frontend assets...', 'cmd' => "cd {$base} && npm run build 2>&1", 'required' => false],
+            ['label' => 'Building frontend assets...', 'cmd' => "cd {$base} && npx vite build 2>&1", 'required' => false],
             ['label' => 'Running migrations...', 'cmd' => "cd {$base} && php artisan migrate --force --no-interaction 2>&1", 'required' => true],
             ['label' => 'Clearing caches...', 'cmd' => "cd {$base} && php artisan config:clear && php artisan route:clear && php artisan view:clear 2>&1", 'required' => true],
             ['label' => 'Caching routes...', 'cmd' => "cd {$base} && php artisan route:cache 2>&1", 'required' => true],
