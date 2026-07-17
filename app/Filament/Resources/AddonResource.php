@@ -108,6 +108,13 @@ class AddonResource extends Resource
 
                 Forms\Components\Section::make('Settings')
                     ->schema([
+                        Forms\Components\Select::make('server_extension')
+                            ->options([
+                                '' => 'All Extensions',
+                                'pterodactyl' => 'Pterodactyl',
+                            ])
+                            ->nullable()
+                            ->helperText('Limit this addon to a specific server extension'),
                         Forms\Components\Toggle::make('is_active')
                             ->default(true),
                         Forms\Components\Toggle::make('is_required')
@@ -162,6 +169,13 @@ class AddonResource extends Resource
                     ->counts('serviceAddons')
                     ->label('Installed')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('server_extension')
+                    ->badge(fn ($state) => match ($state) {
+                        'pterodactyl' => 'success',
+                        null => 'gray',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => $state ? ucfirst($state) : 'All'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category_id')

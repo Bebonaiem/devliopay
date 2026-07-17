@@ -26,6 +26,7 @@ class Addon extends Model
         'extra_databases',
         'extra_allocations',
         'extra_backups',
+        'server_extension',
     ];
 
     protected $casts = [

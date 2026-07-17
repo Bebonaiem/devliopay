@@ -60,6 +60,10 @@ class ServiceController extends Controller
         }
 
         $availableAddons = Addon::where('is_active', true)
+            ->where(function ($query) use ($service) {
+                $query->whereNull('server_extension')
+                    ->orWhere('server_extension', $service->server_extension);
+            })
             ->whereNotIn('id', $service->addons->pluck('id'))
             ->orderBy('sort_order')
             ->get();
