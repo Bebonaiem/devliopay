@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Currency;
 use App\Models\Product;
 use App\Services\Servers\PterodactylServer;
@@ -283,7 +284,11 @@ class ProductResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\PricingRelationManager::class,
+            RelationManagers\ServicesRelationManager::class,
+            RelationManagers\OrderItemsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

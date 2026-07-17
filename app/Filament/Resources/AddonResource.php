@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AddonResource\Pages;
+use App\Filament\Resources\AddonResource\RelationManagers;
 use App\Models\Addon;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -128,7 +129,9 @@ class AddonResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\ServiceAddonsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
