@@ -1,4 +1,4 @@
-<div>
+<x-filament-widgets::widget>
     <div class="flex items-center justify-between">
         <div>
             <div class="text-lg font-bold">DevlioPay</div>
@@ -13,4 +13,4 @@
             </a>
         </div>
     </div>
-</div>
+</x-filament-widgets::widget>
