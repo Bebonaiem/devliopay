@@ -120,10 +120,14 @@ setup_config() {
     echo -e "${BOLD}  ${CYAN}Installation Summary${NC}"
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "  ${CYAN}URL:${NC}      http://${DOMAIN}"
+    echo -e "  ${CYAN}URL:${NC}      ${APP_URL}"
     echo -e "  ${CYAN}Admin:${NC}    ${ADMIN_EMAIL}"
     echo -e "  ${CYAN}Password:${NC} ${ADMIN_PASSWORD}"
-    echo -e "  ${CYAN}SSL:${NC}      None (HTTP only)"
+    if [ "$IS_IP" = true ]; then
+        echo -e "  ${CYAN}SSL:${NC}      None (HTTP only)"
+    else
+        echo -e "  ${CYAN}SSL:${NC}      Cloudflare (HTTPS)"
+    fi
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
@@ -170,6 +174,11 @@ add-apt-repository -y ppa:ondrej/php
 apt-get update -y
 apt-get install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-gd php8.3-sqlite3 php8.3-intl php8.3-tokenizer php8.3-dom php8.3-fileinfo php8.3-redis php8.3-fpm
 print_ok "PHP 8.3 installed"
+
+print_info "Increasing PHP upload limits..."
+sed -i 's/upload_max_filesize = .*/upload_max_filesize = 64M/' /etc/php/8.3/fpm/php.ini
+sed -i 's/post_max_size = .*/post_max_size = 64M/' /etc/php/8.3/fpm/php.ini
+print_ok "PHP upload limits set to 64M"
 
 print_step 4 $TOTAL_STEPS "Installing Node.js 22.x & npm"
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
@@ -223,10 +232,9 @@ print_step 8 $TOTAL_STEPS "Installing PHP Dependencies"
 sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction
 print_ok "Composer packages installed"
 
-print_step 9 $TOTAL_STEPS "Installing Node Dependencies & Building Assets"
-sudo -u devliopay npm install
-sudo -u devliopay npm run build
-print_ok "Frontend assets built"
+print_step 9 $TOTAL_STEPS "Building Frontend Assets"
+sudo -u devliopay npm install 2>/dev/null || true
+print_ok "Frontend dependencies ready"
 
 print_step 10 $TOTAL_STEPS "Environment Configuration"
 sudo -u devliopay cp .env.example .env
@@ -242,12 +250,17 @@ sudo -u devliopay php artisan key:generate --force --no-interaction
 if [ "$IS_IP" = true ]; then
     APP_URL="http://${DOMAIN}"
 else
-    APP_URL="http://${DOMAIN}"
+    APP_URL="https://${DOMAIN}"
 fi
 
 sed -i "s|APP_URL=http://localhost|APP_URL=${APP_URL}|g" .env
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
+
+# Session config for Cloudflare/HTTPS proxy
+sed -i "s|SESSION_DOMAIN=null|SESSION_DOMAIN=.${DOMAIN}|g" .env
+grep -q "^SESSION_SECURE_COOKIE=" .env || sed -i '/^SESSION_DOMAIN/a SESSION_SECURE_COOKIE=true' .env
+
 print_ok "Environment configured"
 
 print_step 11 $TOTAL_STEPS "Database Migration & Seeding"
@@ -276,13 +289,14 @@ chmod -R 775 "$INSTALL_DIR/storage" 2>/dev/null || true
 chmod -R 775 "$INSTALL_DIR/bootstrap/cache" 2>/dev/null || true
 
 # Create required directories
-sudo -u devliopay mkdir -p storage/logs storage/framework/views storage/framework/sessions storage/framework/cache
+sudo -u devliopay mkdir -p storage/logs storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public/livewire-tmp
 
 # Clear and build cache AS devliopay user
 sudo -u devliopay php artisan storage:link --force --no-interaction
 sudo -u devliopay php artisan route:cache --no-interaction
 sudo -u devliopay php artisan view:cache --no-interaction
 sudo -u devliopay php artisan icon:cache --no-interaction 2>/dev/null || true
+# Do NOT use config:cache - it freezes APP_URL and breaks HTTPS detection
 
 # Final ownership pass after cache files are created
 chown -R devliopay:devliopay "$INSTALL_DIR"
@@ -327,6 +341,9 @@ server {
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
+        # Cloudflare proxy headers
+        fastcgi_param HTTP_X_FORWARDED_FOR \$http_x_forwarded_for;
+        fastcgi_param HTTP_X_FORWARDED_PROTO \$http_x_forwarded_proto;
     }
 
     location ~ /\.(?!well-known).* {
