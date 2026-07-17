@@ -28,13 +28,11 @@ print_banner() {
 # ─── Configuration ─────────────────────────────────────────────────────────────
 DOMAIN="${1:-}"
 
-# If no argument passed, prompt the user
+# Prompt for domain or IP
 if [ -z "$DOMAIN" ]; then
     echo -e "${CYAN}Enter your domain name or server IP (e.g. devliopay.com or 123.45.67.89):${NC}"
     read -r DOMAIN
 fi
-
-# Default to localhost if still empty
 DOMAIN="${DOMAIN:-localhost}"
 
 # Detect if input is an IP address or a domain
@@ -44,9 +42,21 @@ if echo "$DOMAIN" | grep -qE '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
 fi
 
 INSTALL_DIR="/var/www/devliopay"
-ADMIN_NAME="Admin"
-ADMIN_EMAIL="admin@${DOMAIN}"
-ADMIN_PASSWORD=$(openssl rand -base64 12)
+
+# Prompt for admin details
+echo -e "${CYAN}Enter admin name:${NC}"
+read -r ADMIN_NAME
+ADMIN_NAME="${ADMIN_NAME:-Admin}"
+
+echo -e "${CYAN}Enter admin email:${NC}"
+read -r ADMIN_EMAIL
+ADMIN_EMAIL="${ADMIN_EMAIL:-admin@${DOMAIN}}"
+
+echo -e "${CYAN}Enter admin password:${NC}"
+read -rs ADMIN_PASSWORD
+echo ""
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(openssl rand -base64 12)}"
+
 DB_PASSWORD=$(openssl rand -base64 32)
 
 print_banner
