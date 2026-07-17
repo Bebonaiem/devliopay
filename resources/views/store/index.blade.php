@@ -47,7 +47,7 @@
                     <div class="flex items-end justify-between">
                         <div>
                             <span class="text-xs text-gray-500">Starting from</span>
-                            <div class="text-2xl font-black">{{ $defaultCurrencySymbol }}{{ number_format($product->pricing->min('price') ?? $product->base_price ?? 0, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></div>
+                            <div class="text-2xl font-black">{{ $product->pricing->first()?->currencies->first()?->symbol ?? $defaultCurrencySymbol }}{{ number_format($product->pricing->min('price') ?? $product->base_price ?? 0, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></div>
                         </div>
                         <a href="{{ route('store.show', $product->slug) }}" class="btn-primary px-5 py-2.5 rounded-xl text-xs font-semibold text-white shadow-lg shadow-brand-500/20">
                             Configure

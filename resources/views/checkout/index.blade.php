@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php $symbol = $items[array_key_first($items)]['pricing']->currencies->first()?->symbol ?? $defaultCurrencySymbol; @endphp
+
 @section('title', 'Checkout')
 
 @section('content')
@@ -23,7 +25,7 @@
                             <i data-lucide="wallet" class="w-5 h-5 text-gray-400"></i>
                             <div>
                                 <p class="text-sm font-medium">Credit Balance</p>
-                                <p class="text-xs text-gray-500">Available: {{ $defaultCurrencySymbol }}{{ number_format($creditBalance, 2) }}</p>
+                                <p class="text-xs text-gray-500">Available: {{ $symbol }}{{ number_format($creditBalance, 2) }}</p>
                             </div>
                         </label>
                         @endif
@@ -85,31 +87,31 @@
                             <p class="text-sm font-medium truncate">{{ $item['product']->name ?? 'Product' }}</p>
                             <p class="text-[11px] text-gray-500">{{ $item['pricing']->cycle ?? 'Monthly' }}</p>
                         </div>
-                        <span class="text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($item['pricing']->price ?? 0, 2) }}</span>
+                        <span class="text-sm font-semibold">{{ $symbol }}{{ number_format($item['pricing']->price ?? 0, 2) }}</span>
                     </div>
                     @endforeach
                 </div>
                 <hr class="border-white/5">
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-400">Subtotal</span>
-                    <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($subtotal ?? 0, 2) }}</span>
+                    <span class="text-sm font-medium">{{ $symbol }}{{ number_format($subtotal ?? 0, 2) }}</span>
                 </div>
                 @if(($discount ?? 0) > 0)
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-emerald-400">Discount</span>
-                    <span class="text-sm font-medium text-emerald-400">-{{ $defaultCurrencySymbol }}{{ number_format($discount, 2) }}</span>
+                    <span class="text-sm font-medium text-emerald-400">-{{ $symbol }}{{ number_format($discount, 2) }}</span>
                 </div>
                 @endif
                 @if(($tax ?? 0) > 0)
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-400">Tax</span>
-                    <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($tax, 2) }}</span>
+                    <span class="text-sm font-medium">{{ $symbol }}{{ number_format($tax, 2) }}</span>
                 </div>
                 @endif
                 <hr class="border-white/5">
                 <div class="flex items-center justify-between">
                     <span class="text-base font-semibold">Total Due Today</span>
-                    <span class="text-xl font-black">{{ $defaultCurrencySymbol }}{{ number_format($total ?? 0, 2) }}</span>
+                    <span class="text-xl font-black">{{ $symbol }}{{ number_format($total ?? 0, 2) }}</span>
                 </div>
             </div>
         </div>

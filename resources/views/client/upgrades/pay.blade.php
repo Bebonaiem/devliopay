@@ -2,6 +2,8 @@
 
 @section('title', 'Upgrade Payment')
 
+@php $symbol = $service->pricing->currencies->first()?->symbol ?? $defaultCurrencySymbol; @endphp
+
 @section('content')
 <div class="max-w-lg mx-auto space-y-6">
     <div class="flex items-center gap-2 text-sm text-gray-500">
@@ -28,7 +30,7 @@
             <hr class="border-white/5 my-3">
             <div class="flex items-center justify-between">
                 <span class="text-sm font-semibold">Amount Due</span>
-                <span class="text-lg font-black">{{ $defaultCurrencySymbol }}{{ number_format($upgrade->price_diff ?? 0, 2) }}</span>
+                <span class="text-lg font-black">{{ $symbol }}{{ number_format($upgrade->price_diff ?? 0, 2) }}</span>
             </div>
         </div>
 
@@ -41,7 +43,7 @@
                     <i data-lucide="wallet" class="w-5 h-5 text-gray-400 peer-checked:text-brand-400"></i>
                     <div>
                         <p class="text-sm font-medium">Credit Balance</p>
-                        <p class="text-xs text-gray-500">Available: {{ $defaultCurrencySymbol }}{{ number_format($balance ?? 0, 2) }}</p>
+                        <p class="text-xs text-gray-500">Available: {{ $symbol }}{{ number_format($balance ?? 0, 2) }}</p>
                     </div>
                 </label>
                 <label class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/10 hover:border-brand-500/30 cursor-pointer transition-all has-[:checked]:border-brand-500/50 has-[:checked]:bg-brand-500/5">
