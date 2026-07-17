@@ -195,18 +195,14 @@ class BillingService
 
     public function generateOrderInvoice(Order $order): Invoice
     {
-        $taxAmount = 0;
+        $taxAmount = $order->tax ?? 0;
         $taxRate = null;
+        $total = $order->total ?? $order->subtotal;
 
         $user = $order->user;
         if ($user) {
             $taxRate = TaxRate::findByLocation($user->country, $user->state, $user->zip_code);
-            if ($taxRate) {
-                $taxAmount = $taxRate->calculateTax($order->subtotal);
-            }
         }
-
-        $total = $taxRate && $taxRate->is_inclusive ? $order->subtotal : $order->subtotal + $taxAmount;
 
         $invoice = Invoice::create([
             'user_id' => $order->user_id,

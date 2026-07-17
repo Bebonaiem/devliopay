@@ -227,12 +227,12 @@ class CartController extends Controller
 
         $taxRate = \App\Models\TaxRate::findByLocation($user->country, $user->state, $user->zip_code);
         $taxAmount = 0;
-        if ($taxRate && ! $taxRate->is_inclusive) {
+        if ($taxRate) {
             $taxAmount = $taxRate->calculateTax($total);
         }
 
         $subtotal = $total;
-        $totalWithTax = $total + $taxAmount;
+        $totalWithTax = $taxRate && $taxRate->is_inclusive ? $total : $total + $taxAmount;
 
         // Apply promo discount
         $promoDiscount = session()->get('promo_discount', 0);
