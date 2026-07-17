@@ -38,6 +38,12 @@ class ReportsPage extends Page implements HasForms
 
     public array $topProducts = [];
 
+    public array $recentOrders = [];
+
+    public string $periodLabel = 'Last 30 Days';
+
+    public int $maxMonthRevenue = 0;
+
     public function mount(): void
     {
         $this->form->fill([
@@ -62,7 +68,7 @@ class ReportsPage extends Page implements HasForms
                             ->required(),
                         Forms\Components\Actions\ActionContainer::make(
                             Forms\Components\Actions\Action::make('filter')
-                                ->label('Filter')
+                                ->label('Apply Filter')
                                 ->icon('heroicon-m-funnel')
                                 ->color('primary')
                                 ->action(fn () => $this->loadStats())
@@ -70,6 +76,38 @@ class ReportsPage extends Page implements HasForms
                     ]),
             ])
             ->statePath('data');
+    }
+
+    public function setPreset(string $preset): void
+    {
+        $this->form->fill([
+            'start_date' => match ($preset) {
+                'today' => now()->format('Y-m-d'),
+                'yesterday' => now()->subDay()->format('Y-m-d'),
+                'week' => now()->startOfWeek()->format('Y-m-d'),
+                'month' => now()->startOfMonth()->format('Y-m-d'),
+                'quarter' => now()->startOfQuarter()->format('Y-m-d'),
+                'year' => now()->startOfYear()->format('Y-m-d'),
+                'last30' => now()->subDays(30)->format('Y-m-d'),
+                'last90' => now()->subDays(90)->format('Y-m-d'),
+                default => now()->subDays(30)->format('Y-m-d'),
+            },
+            'end_date' => now()->format('Y-m-d'),
+        ]);
+
+        $this->periodLabel = match ($preset) {
+            'today' => 'Today',
+            'yesterday' => 'Yesterday',
+            'week' => 'This Week',
+            'month' => 'This Month',
+            'quarter' => 'This Quarter',
+            'year' => 'This Year',
+            'last30' => 'Last 30 Days',
+            'last90' => 'Last 90 Days',
+            default => 'Custom Range',
+        };
+
+        $this->loadStats();
     }
 
     public function loadStats(): void
@@ -87,21 +125,34 @@ class ReportsPage extends Page implements HasForms
             ->whereYear('paid_at', now()->year)
             ->sum('total');
 
-        $this->stats['total_orders'] = Order::count();
+        $this->stats['total_orders'] = Order::whereIn('status', ['paid', 'completed'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
 
         $this->stats['total_services'] = Service::count();
 
         $this->stats['total_users'] = User::count();
 
+        $this->stats['new_users'] = User::whereBetween('created_at', [$startDate, $endDate])->count();
+
         $this->stats['active_services'] = Service::where('status', 'active')->count();
 
         $this->stats['pending_invoices'] = Invoice::where('status', 'pending')->count();
+
+        $this->stats['overdue_invoices'] = Invoice::where('status', 'pending')
+            ->where('due_at', '<', now())
+            ->count();
 
         $this->stats['avg_invoice_value'] = Invoice::where('status', 'paid')
             ->whereBetween('paid_at', [$startDate, $endDate])
             ->avg('total');
 
+        $this->stats['conversion_rate'] = $this->stats['total_users'] > 0
+            ? round(($this->stats['total_services'] / $this->stats['total_users']) * 100, 1)
+            : 0;
+
         $this->revenueByMonth = [];
+        $maxRevenue = 0;
         for ($i = 11; $i >= 0; $i--) {
             $month = now()->subMonths($i);
             $revenue = Invoice::where('status', 'paid')
@@ -109,22 +160,46 @@ class ReportsPage extends Page implements HasForms
                 ->whereYear('paid_at', $month->year)
                 ->sum('total');
             $this->revenueByMonth[] = [
-                'month' => $month->format('M Y'),
+                'month' => $month->format('M'),
+                'year' => $month->format('Y'),
                 'revenue' => number_format($revenue, 2),
                 'raw' => $revenue,
             ];
+            $maxRevenue = max($maxRevenue, $revenue);
         }
+        $this->maxMonthRevenue = max($maxRevenue, 1);
 
         $this->topProducts = OrderItem::select('product_id', DB::raw('COUNT(*) as order_count'), DB::raw('SUM(price * quantity) as total_revenue'))
             ->with('product')
             ->groupBy('product_id')
             ->orderByDesc('order_count')
-            ->limit(10)
+            ->limit(5)
             ->get()
             ->map(fn ($item) => [
                 'name' => $item->product?->name ?? 'Unknown',
                 'order_count' => $item->order_count,
                 'total_revenue' => number_format($item->total_revenue, 2),
+                'raw_revenue' => $item->total_revenue,
+            ])
+            ->toArray();
+
+        $maxProductRevenue = collect($this->topProducts)->max('raw_revenue') ?: 1;
+        foreach ($this->topProducts as &$product) {
+            $product['bar_width'] = round(($product['raw_revenue'] / $maxProductRevenue) * 100);
+        }
+
+        $this->recentOrders = Order::with('user')
+            ->whereIn('status', ['paid', 'completed'])
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get()
+            ->map(fn ($order) => [
+                'id' => $order->id,
+                'number' => $order->number,
+                'user' => $order->user->name ?? 'Unknown',
+                'total' => number_format($order->total, 2),
+                'status' => $order->status,
+                'date' => $order->created_at->diffForHumans(),
             ])
             ->toArray();
     }
