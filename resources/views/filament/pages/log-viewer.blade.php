@@ -6,7 +6,7 @@
                 <select wire:model.live="selectedLog"
                         class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
                     @foreach($logFiles as $file)
-                        <option value="{{ $file }}">{{ $file }}</option>
+                        <option value="{{ $file }}" style="background:#1a1c2e;color:#fff">{{ $file }}</option>
                     @endforeach
                 </select>
             </div>

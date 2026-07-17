@@ -104,9 +104,9 @@
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Node</label>
                     <select wire:model.live="filterNode"
                             class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
-                        <option value="">All Nodes</option>
+                        <option value="" style="background:#1a1c2e;color:#fff">All Nodes</option>
                         @foreach($this->getNodeOptions() as $nodeId => $nodeName)
-                            <option value="{{ $nodeId }}">{{ $nodeName }}</option>
+                            <option value="{{ $nodeId }}" style="background:#1a1c2e;color:#fff">{{ $nodeName }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -115,9 +115,9 @@
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Status</label>
                     <select wire:model.live="filterStatus"
                             class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
-                        <option value="">All</option>
-                        <option value="assigned">Assigned</option>
-                        <option value="free">Free</option>
+                        <option value="" style="background:#1a1c2e;color:#fff">All</option>
+                        <option value="assigned" style="background:#1a1c2e;color:#fff">Assigned</option>
+                        <option value="free" style="background:#1a1c2e;color:#fff">Free</option>
                     </select>
                 </div>
 
@@ -125,10 +125,10 @@
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Per Page</label>
                     <select wire:model.live="allocPerPage"
                             class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
+                        <option value="10" style="background:#1a1c2e;color:#fff">10</option>
+                        <option value="25" style="background:#1a1c2e;color:#fff">25</option>
+                        <option value="50" style="background:#1a1c2e;color:#fff">50</option>
+                        <option value="100" style="background:#1a1c2e;color:#fff">100</option>
                     </select>
                 </div>
             </div>
