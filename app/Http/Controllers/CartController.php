@@ -29,8 +29,12 @@ class CartController extends Controller
             $pricing = ProductPricing::with('currencies')->find($item['pricing_id']);
 
             if ($product && $pricing) {
-                $price = $pricing->currencies->first()?->pivot->amount ?? 0;
-                $setupFee = $pricing->currencies->first()?->pivot->setup_fee ?? 0;
+                $selectedCurrencyId = $item['currency_id'] ?? null;
+                $pivotCurrency = $selectedCurrencyId
+                    ? $pricing->currencies->first(fn ($c) => $c->id === $selectedCurrencyId)
+                    : $pricing->currencies->first();
+                $price = $pivotCurrency?->pivot->amount ?? 0;
+                $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;
                 $qty = $item['quantity'] ?? 1;
                 $items[$key] = [
                     'product' => $product,
@@ -67,6 +71,7 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'pricing_id' => 'required|exists:product_pricing,id',
+            'currency_id' => 'nullable|exists:currencies,id',
         ]);
 
         $cart = session()->get('cart', []);
@@ -85,11 +90,13 @@ class CartController extends Controller
             } else {
                 $cart[$key]['quantity'] += $quantity;
             }
+            $cart[$key]['currency_id'] = $request->currency_id ?? null;
         } else {
             $cart[$key] = [
                 'product_id' => $request->product_id,
                 'pricing_id' => $request->pricing_id,
                 'quantity' => $quantity,
+                'currency_id' => $request->currency_id ?? null,
                 'config' => $request->only(['hostname', 'os_type', 'server_name']),
             ];
         }
@@ -168,7 +175,10 @@ class CartController extends Controller
                 continue;
             }
 
-            $pivotCurrency = $pricing->currencies->first();
+            $selectedCurrencyId = $item['currency_id'] ?? null;
+            $pivotCurrency = $selectedCurrencyId
+                ? $pricing->currencies->first(fn ($c) => $c->id === $selectedCurrencyId)
+                : $pricing->currencies->first();
             $price = $pivotCurrency?->pivot->amount ?? 0;
             $product = $pricing->product;
             $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;

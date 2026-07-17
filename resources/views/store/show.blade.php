@@ -89,22 +89,40 @@
                         <div class="space-y-2">
                             @foreach($product->pricing as $plan)
                             @php
-                                $planCurrency = $plan->currencies->first();
+                                $planCurrencies = $plan->currencies;
+                                $planCurrency = $planCurrencies->first();
                                 $planSymbol = $planCurrency?->symbol ?? $defaultCurrencySymbol;
                                 $planAmount = $planCurrency?->pivot->amount ?? 0;
                                 $planSetupFee = $planCurrency?->pivot->setup_fee ?? 0;
+                                $currenciesJson = $planCurrencies->map(fn ($c) => [
+                                    'id' => $c->id,
+                                    'symbol' => $c->symbol,
+                                    'code' => $c->code,
+                                    'amount' => $c->pivot->amount,
+                                    'setup_fee' => $c->pivot->setup_fee,
+                                ])->values()->toJson();
                             @endphp
-                            <label class="group flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-brand-500/30 cursor-pointer transition-all has-[:checked]:border-brand-500/50 has-[:checked]:bg-brand-500/5">
-                                <input type="radio" name="pricing_id" value="{{ $plan->id }}" {{ $loop->first ? 'checked' : '' }} class="sr-only" onchange="document.getElementById('selected-price').textContent='{{ $planSymbol }}{{ number_format($planAmount, 2) }}'; var sf={{ $planSetupFee }}; document.getElementById('setup-fee-line').style.display=sf>0?'flex':'none'; document.getElementById('setup-fee-amount').textContent='{{ $planSymbol }}'+sf.toFixed(2);">
-                                <div class="w-4 h-4 rounded-full border-2 border-gray-600 group-has-[:checked]:border-brand-500 flex items-center justify-center transition-colors">
-                                    <div class="w-2 h-2 rounded-full bg-brand-500 scale-0 group-has-[:checked]:scale-100 transition-transform"></div>
+                            <label class="group block p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-brand-500/30 cursor-pointer transition-all has-[:checked]:border-brand-500/50 has-[:checked]:bg-brand-500/5">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="pricing_id" value="{{ $plan->id }}" {{ $loop->first ? 'checked' : '' }} class="sr-only" onchange="updatePlan({{ $currenciesJson }}, this.value)">
+                                    <div class="w-4 h-4 rounded-full border-2 border-gray-600 group-has-[:checked]:border-brand-500 flex items-center justify-center transition-colors">
+                                        <div class="w-2 h-2 rounded-full bg-brand-500 scale-0 group-has-[:checked]:scale-100 transition-transform"></div>
+                                    </div>
+                                    <span class="text-sm font-medium flex-1">{{ $plan->name ?? $plan->cycle }}</span>
+                                    <span class="text-sm font-semibold plan-price" data-plan-id="{{ $plan->id }}">{{ $planSymbol }}{{ number_format($planAmount, 2) }}<span class="text-gray-500 font-normal">{{ $plan->frequency }}</span></span>
                                 </div>
-                                <span class="text-sm font-medium flex-1">{{ $plan->name ?? $plan->cycle }}</span>
-                                <span class="text-sm font-semibold">{{ $planSymbol }}{{ number_format($planAmount, 2) }}<span class="text-gray-500 font-normal">{{ $plan->frequency }}</span></span>
+                                @if(count($planCurrencies) > 1)
+                                <div class="mt-2 ml-7 flex flex-wrap gap-1.5 currency-options" data-plan-id="{{ $plan->id }}">
+                                    @foreach($planCurrencies as $c)
+                                    <button type="button" onclick="selectCurrency(this, {{ $c->id }}, '{{ $c->symbol }}', '{{ $c->code }}', {{ $c->pivot->amount }}, {{ $c->pivot->setup_fee }})" data-currency-id="{{ $c->id }}" class="currency-btn px-2 py-0.5 rounded-md text-[10px] font-semibold border transition-all {{ $loop->first ? 'border-brand-500/50 bg-brand-500/10 text-brand-400' : 'border-white/10 text-gray-500 hover:text-gray-300 hover:border-white/20' }}">{{ $c->symbol }} {{ $c->code }}</button>
+                                    @endforeach
+                                </div>
+                                @endif
                             </label>
                             @endforeach
                         </div>
                     </div>
+                    <input type="hidden" name="currency_id" id="currency_id" value="{{ $firstPlanCurrency?->id }}">
                     @endif
 
                     {{-- Qty --}}
@@ -123,4 +141,45 @@
         </div>
     </div>
 </div>
+
+<script>
+let currentCurrencies = [];
+
+function updatePlan(currencies, planId) {
+    currentCurrencies = currencies;
+    if (currencies.length > 0) {
+        const c = currencies[0];
+        document.getElementById('selected-price').textContent = c.symbol + parseFloat(c.amount).toFixed(2);
+        document.getElementById('currency_id').value = c.id;
+        var sf = parseFloat(c.setup_fee) || 0;
+        document.getElementById('setup-fee-line').style.display = sf > 0 ? 'flex' : 'none';
+        document.getElementById('setup-fee-amount').textContent = c.symbol + sf.toFixed(2);
+    }
+
+    document.querySelectorAll('.currency-options').forEach(el => el.style.display = 'none');
+    var activeOptions = document.querySelector('.currency-options[data-plan-id="' + planId + '"]');
+    if (activeOptions) activeOptions.style.display = 'flex';
+}
+
+function selectCurrency(btn, currencyId, symbol, code, amount, setupFee) {
+    document.getElementById('currency_id').value = currencyId;
+    document.getElementById('selected-price').textContent = symbol + parseFloat(amount).toFixed(2);
+    var sf = parseFloat(setupFee) || 0;
+    document.getElementById('setup-fee-line').style.display = sf > 0 ? 'flex' : 'none';
+    document.getElementById('setup-fee-amount').textContent = symbol + sf.toFixed(2);
+
+    var parent = btn.closest('.currency-options');
+    parent.querySelectorAll('.currency-btn').forEach(b => {
+        b.classList.remove('border-brand-500/50', 'bg-brand-500/10', 'text-brand-400');
+        b.classList.add('border-white/10', 'text-gray-500');
+    });
+    btn.classList.remove('border-white/10', 'text-gray-500');
+    btn.classList.add('border-brand-500/50', 'bg-brand-500/10', 'text-brand-400');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var firstPlanBtn = document.querySelector('input[name="pricing_id"]:checked');
+    if (firstPlanBtn) firstPlanBtn.dispatchEvent(new Event('change'));
+});
+</script>
 @endsection
