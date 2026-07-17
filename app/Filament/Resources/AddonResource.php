@@ -54,7 +54,7 @@ class AddonResource extends Resource
                         Forms\Components\TextInput::make('price')
                             ->required()
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix(fn () => \App\Models\Currency::defaultSymbol())
                             ->minValue(0),
                         Forms\Components\Select::make('billing_interval')
                             ->options([

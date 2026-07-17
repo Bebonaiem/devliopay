@@ -173,11 +173,11 @@ class OrderResource extends Resource
                             ->default('pending'),
                         Forms\Components\TextInput::make('total')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix(fn ($record) => $record?->currency?->symbol ?? Currency::defaultSymbol())
                             ->disabled(),
                         Forms\Components\TextInput::make('setup_fee')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix(fn ($record) => $record?->currency?->symbol ?? Currency::defaultSymbol())
                             ->disabled(),
                         Forms\Components\Select::make('currency_id')
                             ->relationship('currency', 'name')

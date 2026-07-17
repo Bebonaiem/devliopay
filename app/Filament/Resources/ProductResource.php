@@ -190,11 +190,11 @@ class ProductResource extends Resource
                                             ->numeric()
                                             ->required()
                                             ->default(0)
-                                            ->prefix('$'),
+                                            ->prefix(fn (array $state): string => Currency::find($state['currency_id'] ?? null)?->symbol ?? '$'),
                                         Forms\Components\TextInput::make('setup_fee')
                                             ->numeric()
                                             ->default(0)
-                                            ->prefix('$'),
+                                            ->prefix(fn (array $state): string => Currency::find($state['currency_id'] ?? null)?->symbol ?? '$'),
                                     ])
                                     ->columns(3)
                                     ->collapsible(),

@@ -67,7 +67,7 @@ class UserResource extends Resource
                             ->label('Admin Access'),
                         Forms\Components\TextInput::make('balance')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix(fn () => \App\Models\Currency::defaultSymbol())
                             ->default(0),
                     ])->columns(2),
             ]);

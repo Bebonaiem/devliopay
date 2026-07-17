@@ -45,11 +45,11 @@ class PromoCodeResource extends Resource
                         Forms\Components\TextInput::make('value')
                             ->numeric()
                             ->required()
-                            ->suffix(fn ($get) => $get('type') === 'percentage' ? '%' : '$'),
+                            ->suffix(fn ($get) => $get('type') === 'percentage' ? '%' : \App\Models\Currency::defaultSymbol()),
                         Forms\Components\TextInput::make('min_amount')
                             ->numeric()
                             ->default(0)
-                            ->prefix('$'),
+                            ->prefix(fn () => \App\Models\Currency::defaultSymbol()),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Usage Limits')
