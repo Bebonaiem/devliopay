@@ -43,7 +43,7 @@ apt-get install -y software-properties-common curl wget git unzip zip nginx sqli
 echo -e "${YELLOW}[2/12] Installing PHP 8.3+ & Extensions${NC}"
 add-apt-repository -y ppa:ondrej/php
 apt-get update -y
-apt-get install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-gd php8.3-sqlite3 php8.3-intl php8.3-tokenizer php8.3-dom php8.3-fileinfo php8.3-redis
+apt-get install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-gd php8.3-sqlite3 php8.3-intl php8.3-tokenizer php8.3-dom php8.3-fileinfo php8.3-redis php8.3-fpm
 
 echo -e "${YELLOW}[3/12] Installing Node.js 22.x & npm${NC}"
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
