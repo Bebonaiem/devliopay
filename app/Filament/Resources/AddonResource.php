@@ -17,7 +17,9 @@ class AddonResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
 
-    protected static ?string $navigationGroup = 'Products';
+    protected static ?string $navigationGroup = 'Store';
+
+    protected static ?string $navigationLabel = 'Addons';
 
     protected static ?int $navigationSort = 3;
 

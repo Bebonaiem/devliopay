@@ -20,6 +20,8 @@ class CreditTransactionResource extends Resource
 
     protected static ?string $navigationLabel = 'Credit Transactions';
 
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $modelLabel = 'Credit Transaction';
 
     protected static ?string $pluralModelLabel = 'Credit Transactions';

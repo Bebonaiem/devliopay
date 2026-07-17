@@ -20,6 +20,8 @@ class PromoCodeResource extends Resource
 
     protected static ?string $navigationLabel = 'Promo Codes';
 
+    protected static ?int $navigationSort = 4;
+
     public static function form(Form $form): Form
     {
         return $form

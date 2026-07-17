@@ -20,6 +20,8 @@ class ServiceUpgradeResource extends Resource
 
     protected static ?string $navigationLabel = 'Upgrade Log';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $modelLabel = 'Service Upgrade';
 
     protected static ?string $pluralModelLabel = 'Service Upgrades';

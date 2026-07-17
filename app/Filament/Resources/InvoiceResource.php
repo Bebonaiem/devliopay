@@ -26,6 +26,8 @@ class InvoiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Invoices';
 
+    protected static ?int $navigationSort = 2;
+
     private static function getCurrencySymbol(): string
     {
         $default = Currency::where('is_default', true)->first();

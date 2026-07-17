@@ -16,9 +16,11 @@ class GeneralSettings extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $navigationLabel = 'General Settings';
+
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $title = 'General Settings';
 

@@ -10,9 +10,11 @@ class GitHubUpdate extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 12;
+    protected static ?string $navigationLabel = 'GitHub Update';
+
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $title = 'GitHub Update';
 

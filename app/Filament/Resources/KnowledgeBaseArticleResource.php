@@ -20,6 +20,8 @@ class KnowledgeBaseArticleResource extends Resource
 
     protected static ?string $navigationLabel = 'Knowledge Base';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form

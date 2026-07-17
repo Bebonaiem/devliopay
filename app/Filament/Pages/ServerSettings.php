@@ -16,9 +16,11 @@ class ServerSettings extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-server';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $navigationLabel = 'Server Settings';
+
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $title = 'Server Provisioning Settings';
 

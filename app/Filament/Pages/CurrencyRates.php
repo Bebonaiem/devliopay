@@ -18,9 +18,11 @@ class CurrencyRates extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $navigationLabel = 'Exchange Rates';
+
+    protected static ?int $navigationSort = 9;
 
     protected static ?string $title = 'Currency Exchange Rates';
 

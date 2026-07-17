@@ -11,9 +11,11 @@ class PterodactylNodes extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $navigationLabel = 'Pterodactyl Nodes';
+
+    protected static ?int $navigationSort = 8;
 
     protected static ?string $title = 'Pterodactyl Nodes & Allocations';
 

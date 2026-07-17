@@ -14,9 +14,11 @@ class SystemHealth extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 11;
+    protected static ?string $navigationLabel = 'System Health';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $title = 'System Health';
 

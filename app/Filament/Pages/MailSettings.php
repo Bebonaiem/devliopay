@@ -18,9 +18,11 @@ class MailSettings extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $navigationLabel = 'Mail Settings';
+
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $title = 'Mail Settings';
 

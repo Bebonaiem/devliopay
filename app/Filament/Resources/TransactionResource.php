@@ -21,6 +21,8 @@ class TransactionResource extends Resource
 
     protected static ?string $navigationLabel = 'Transactions';
 
+    protected static ?int $navigationSort = 3;
+
     public static function table(Table $table): Table
     {
         return $table

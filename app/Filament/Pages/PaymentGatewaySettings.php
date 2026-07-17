@@ -17,9 +17,11 @@ class PaymentGatewaySettings extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $navigationLabel = 'Payment Gateways';
+
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $title = 'Payment Gateway Settings';
 

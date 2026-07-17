@@ -9,9 +9,11 @@ class ActivityLogPage extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-clock';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?string $navigationLabel = 'Activity Log';
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $title = 'Activity Log';
 

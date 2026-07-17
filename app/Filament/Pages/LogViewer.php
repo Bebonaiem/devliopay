@@ -9,9 +9,11 @@ class LogViewer extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'System';
 
     protected static ?string $navigationLabel = 'Log Viewer';
+
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $title = 'Laravel Log Viewer';
 
