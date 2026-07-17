@@ -17,7 +17,9 @@
 
     <div class="glass rounded-2xl p-6 text-center space-y-6">
         @if(isset($qrCode))
-        <div class="inline-block p-4 bg-white rounded-2xl">{!! $qrCode !!}</div>
+        <div class="inline-block p-4 bg-white rounded-2xl">
+            <img src="{{ $qrCode }}" alt="QR Code" class="w-48 h-48">
+        </div>
         @else
         <div class="w-48 h-48 mx-auto bg-white/5 rounded-2xl flex items-center justify-center">
             <i data-lucide="qr-code" class="w-16 h-16 text-gray-600"></i>
