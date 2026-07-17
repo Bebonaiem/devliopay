@@ -65,7 +65,7 @@
 
             <div class="space-y-1">
                 @foreach($commits as $commit)
-                    <div class="text-sm font-mono text-gray-700 dark:text-gray-300 py-1 border-b border-gray-200 dark:border-gray-700">
+                    <div class="text-sm font-mono text-gray-700 dark:text-gray-200 py-2 border-b border-gray-200 dark:border-white/10">
                         {{ $commit }}
                     </div>
                 @endforeach
