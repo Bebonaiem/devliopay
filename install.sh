@@ -254,6 +254,7 @@ sudo -u devliopay php artisan tinker --execute="
     'email_verified_at' => now(),
     'is_admin' => true,
 ]);
+\$user->markEmailAsVerified();
 echo 'Admin user created: ' . \$user->email;
 " 2>&1
 print_ok "Admin user created: ${ADMIN_EMAIL}"

@@ -26,7 +26,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            if (is_null(Auth::user()->email_verified_at)) {
+            if (is_null(Auth::user()->email_verified_at) && !Auth::user()->is_admin) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
