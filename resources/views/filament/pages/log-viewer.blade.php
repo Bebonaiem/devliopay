@@ -4,9 +4,9 @@
             <div class="flex-1 min-w-[200px]">
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Log File</label>
                 <select wire:model.live="selectedLog"
-                        class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                        class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none dark:[color-scheme:dark]">
                     @foreach($logFiles as $file)
-                        <option value="{{ $file }}" style="background:#1a1c2e;color:#fff">{{ $file }}</option>
+                        <option value="{{ $file }}">{{ $file }}</option>
                     @endforeach
                 </select>
             </div>
