@@ -39,7 +39,12 @@
                             </form>
                         </div>
                         @endif
+                        <div class="text-right">
                         <span class="text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($item['line_total'] ?? $item['price'] ?? 0, 2) }}<span class="text-gray-500 font-normal">{{ $item['pricing']->frequency ?? '/mo' }}</span></span>
+                        @if(($item['setup_fee'] ?? 0) > 0)
+                        <div class="text-[11px] text-amber-400">+{{ $defaultCurrencySymbol }}{{ number_format($item['setup_fee'], 2) }} setup</div>
+                        @endif
+                        </div>
                         <form id="remove-cart-{{ $key }}" method="POST" action="{{ route('cart.remove', $key) }}">
                             @csrf
                             @method('DELETE')

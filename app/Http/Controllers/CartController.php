@@ -30,15 +30,17 @@ class CartController extends Controller
 
             if ($product && $pricing) {
                 $price = $pricing->currencies->first()?->pivot->amount ?? 0;
+                $setupFee = $pricing->currencies->first()?->pivot->setup_fee ?? 0;
                 $qty = $item['quantity'] ?? 1;
                 $items[$key] = [
                     'product' => $product,
                     'pricing' => $pricing,
                     'price' => $price,
+                    'setup_fee' => $setupFee,
                     'quantity' => $qty,
-                    'line_total' => $price * $qty,
+                    'line_total' => ($price * $qty) + $setupFee,
                 ];
-                $subtotal += $price * $qty;
+                $subtotal += ($price * $qty) + $setupFee;
             }
         }
 

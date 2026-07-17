@@ -66,6 +66,14 @@
                     <span class="text-sm font-medium text-gray-500">/mo</span>
                 </div>
 
+                @php
+                    $firstPlanSetupFee = $product->pricing->first()?->currencies->first()?->pivot->setup_fee ?? 0;
+                @endphp
+                <div id="setup-fee-line" class="flex items-center gap-2 text-xs {{ $firstPlanSetupFee > 0 ? '' : 'hidden' }}" style="{{ $firstPlanSetupFee > 0 ? '' : 'display:none' }}">
+                    <i data-lucide="info" class="w-3 h-3 text-amber-400"></i>
+                    <span class="text-gray-400">+ <span id="setup-fee-amount">{{ $defaultCurrencySymbol }}{{ number_format($firstPlanSetupFee, 2) }}</span> one-time setup fee</span>
+                </div>
+
                 <form method="POST" action="{{ route('cart.add') }}" class="space-y-4">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -77,7 +85,7 @@
                         <div class="space-y-2">
                             @foreach($product->pricing as $plan)
                             <label class="group flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-brand-500/30 cursor-pointer transition-all has-[:checked]:border-brand-500/50 has-[:checked]:bg-brand-500/5">
-                                <input type="radio" name="pricing_id" value="{{ $plan->id }}" {{ $loop->first ? 'checked' : '' }} class="sr-only" onchange="document.getElementById('selected-price').textContent='{{ $defaultCurrencySymbol }}{{ number_format($plan->price, 2) }}'">
+                                <input type="radio" name="pricing_id" value="{{ $plan->id }}" {{ $loop->first ? 'checked' : '' }} class="sr-only" onchange="document.getElementById('selected-price').textContent='{{ $defaultCurrencySymbol }}{{ number_format($plan->price, 2) }}'; var sf={{ $plan->currencies->first()?->pivot->setup_fee ?? 0 }}; document.getElementById('setup-fee-line').style.display=sf>0?'flex':'none'; document.getElementById('setup-fee-amount').textContent='{{ $defaultCurrencySymbol }}'+sf.toFixed(2);">
                                 <div class="w-4 h-4 rounded-full border-2 border-gray-600 group-has-[:checked]:border-brand-500 flex items-center justify-center transition-colors">
                                     <div class="w-2 h-2 rounded-full bg-brand-500 scale-0 group-has-[:checked]:scale-100 transition-transform"></div>
                                 </div>
