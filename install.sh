@@ -142,6 +142,14 @@ setup_config
 TOTAL_STEPS=12
 
 print_step 1 $TOTAL_STEPS "System Update & Dependencies"
+
+# Disable IPv6 if broken on this VPS
+if ! curl -6 --connect-timeout 3 https://getcomposer.org >/dev/null 2>&1; then
+    print_info "Disabling broken IPv6..."
+    sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1 || true
+    sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1 || true
+fi
+
 apt-get update -y
 apt-get upgrade -y
 apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3
