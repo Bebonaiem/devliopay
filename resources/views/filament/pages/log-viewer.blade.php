@@ -1,13 +1,12 @@
 <x-filament-panels::page>
     <div class="space-y-4">
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-end gap-3">
             <div class="flex-1 min-w-[200px]">
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Log File</label>
-                <select wire:model.live="selectedLog" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                    @foreach($logFiles as $file)
-                        <option value="{{ $file }}">{{ $file }}</option>
-                    @endforeach
-                </select>
+                <x-filament::input.select
+                    wire:model.live="selectedLog"
+                    :options="collect($logFiles)->mapWithKeys(fn ($f) => [$f => $f])->toArray()"
+                />
             </div>
 
             <div>
@@ -40,7 +39,7 @@
         <div class="rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
             <div class="overflow-auto max-h-[70vh]">
                 <table class="w-full text-sm">
-                    <thead class="sticky top-0 bg-gray-50 dark:bg-gray-800 z-10">
+                    <thead class="sticky top-0 bg-gray-50 dark:bg-white/5 z-10">
                         <tr class="border-b border-gray-200 dark:border-white/10">
                             <th class="text-left py-2 px-3 font-medium text-gray-500 dark:text-gray-400 w-48">Timestamp</th>
                             <th class="text-left py-2 px-3 font-medium text-gray-500 dark:text-gray-400 w-24">Level</th>
