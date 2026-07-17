@@ -169,6 +169,16 @@ sed -i 's/^;*listen\.owner = .*/listen.owner = devliopay/' /etc/php/8.3/fpm/pool
 sed -i 's/^;*listen\.group = .*/listen.group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
 sed -i 's/^listen = .*/listen = \/run\/php\/php8.3-fpm.sock/' /etc/php/8.3/fpm/pool.d/www.conf
 systemctl restart php8.3-fpm
+# Ensure nginx can access the socket
+chmod 666 /var/run/php/php8.3-fpm.sock 2>/dev/null || true
+
+# Fix socket permissions on every FPM restart
+mkdir -p /etc/systemd/system/php8.3-fpm.service.d/
+cat > /etc/systemd/system/php8.3-fpm.service.d/override.conf <<OVERRIDE
+[Service]
+ExecStartPost=/bin/chmod 666 /run/php/php8.3-fpm.sock
+OVERRIDE
+systemctl daemon-reload
 print_ok "PHP-FPM configured for devliopay user"
 
 print_step 6 $TOTAL_STEPS "Cloning Repository"
@@ -177,8 +187,9 @@ if [ -d "$INSTALL_DIR" ]; then
     rm -rf "$INSTALL_DIR"
 fi
 git clone https://github.com/Bebonaiem/devliopay.git "$INSTALL_DIR"
+chown -R devliopay:devliopay "$INSTALL_DIR"
 cd "$INSTALL_DIR"
-git config --global --add safe.directory "$INSTALL_DIR"
+sudo -u devliopay git config --global --add safe.directory "$INSTALL_DIR"
 print_ok "Repository cloned to ${INSTALL_DIR}"
 
 print_step 7 $TOTAL_STEPS "Installing PHP Dependencies"
