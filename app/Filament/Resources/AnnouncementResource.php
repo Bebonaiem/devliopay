@@ -47,11 +47,12 @@ class AnnouncementResource extends Resource
                         Forms\Components\Toggle::make('is_pinned')
                             ->default(false),
                         Forms\Components\FileUpload::make('image')
-                            ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
                             ->imageEditor()
                             ->disk('public')
                             ->directory('announcements')
-                            ->visibility('public'),
+                            ->visibility('public')
+                            ->maxSize(5120),
                         Forms\Components\RichEditor::make('content')
                             ->required(),
                         Forms\Components\DateTimePicker::make('published_at'),
