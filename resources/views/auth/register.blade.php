@@ -25,10 +25,12 @@
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">First Name</label>
                     <input type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="John">
+                    @error('first_name') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Last Name</label>
                     <input type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="Doe">
+                    @error('last_name') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
