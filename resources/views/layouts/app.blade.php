@@ -66,7 +66,6 @@
             <div class="flex items-center justify-between h-16">
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    <i data-lucide="zap" class="w-6 h-6 text-brand-400"></i>
                     @if($companyLogo)
                         <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="h-8 w-auto">
                     @else
@@ -200,7 +199,6 @@
                 {{-- Brand --}}
                 <div class="lg:col-span-1">
                     <a href="{{ route('home') }}" class="flex items-center gap-3 mb-5">
-                        <i data-lucide="zap" class="w-6 h-6 text-brand-400"></i>
                         <span class="text-lg font-bold">{{ $companyName }}</span>
                     </a>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6">{{ $companyFooterText ?: 'Premium hosting and game server solutions powered by cutting-edge infrastructure.' }}</p>
