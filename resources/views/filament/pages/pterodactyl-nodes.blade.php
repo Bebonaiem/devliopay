@@ -20,7 +20,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse($nodes as $node)
-                <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-white/10">
+                <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/50">
                             <x-heroicon-o-server-stack class="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -31,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         <div>
                             <div class="flex justify-between text-xs mb-1">
                                 <span class="text-gray-500">Memory</span>
