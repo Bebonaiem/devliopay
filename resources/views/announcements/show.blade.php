@@ -13,7 +13,7 @@
     <article class="glass rounded-2xl p-8">
         @if($announcement->image)
             <div class="mb-6 rounded-xl overflow-hidden">
-                <img src="{{ asset('storage/' . $announcement->image) }}" alt="{{ $announcement->title }}" class="w-full h-64 object-cover">
+                <img src="{{ asset('storage/' . $announcement->image) }}" alt="{{ $announcement->title }}" class="w-full h-auto rounded-xl">
             </div>
         @endif
         <h1 class="text-2xl sm:text-3xl font-black tracking-tight mb-4">{{ $announcement->title }}</h1>
