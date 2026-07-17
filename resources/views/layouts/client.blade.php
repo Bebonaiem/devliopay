@@ -66,7 +66,7 @@
             <div class="flex items-center gap-3 px-5 h-16 flex-shrink-0 border-b border-white/5">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     @if($companyLogo)
-                        <img src="{{ asset('storage/'.$companyLogo) }}" alt="{{ $companyName }}" class="h-8 w-auto rounded-lg">
+                        <img src="{{ asset($companyLogo) }}" alt="{{ $companyName }}" class="h-8 w-auto rounded-lg">
                     @else
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 flex-shrink-0">
                             <i data-lucide="zap" class="w-4 h-4 text-white"></i>
@@ -162,7 +162,7 @@
             <div class="flex items-center justify-between px-5 h-16 flex-shrink-0 border-b border-white/5">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     @if($companyLogo)
-                        <img src="{{ asset('storage/'.$companyLogo) }}" alt="{{ $companyName }}" class="h-8 w-auto rounded-lg">
+                        <img src="{{ asset($companyLogo) }}" alt="{{ $companyName }}" class="h-8 w-auto rounded-lg">
                     @else
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 flex-shrink-0">
                             <i data-lucide="zap" class="w-4 h-4 text-white"></i>
@@ -315,7 +315,7 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
             <div class="flex items-center gap-2">
                 @if($companyLogo)
-                    <img src="{{ asset('storage/'.$companyLogo) }}" alt="{{ $companyName }}" class="h-4 w-auto">
+                    <img src="{{ asset($companyLogo) }}" alt="{{ $companyName }}" class="h-4 w-auto">
                 @endif
                 <span>{{ $companyFooterText ?: $companyName . ' — All rights reserved.' }}</span>
             </div>

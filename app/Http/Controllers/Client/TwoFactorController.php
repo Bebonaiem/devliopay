@@ -33,10 +33,10 @@ class TwoFactorController extends Controller
 
         $user->update(['two_factor_secret' => $secret]);
 
-        $qrCodeUrl = $service->getQrCodeUrl($secret, $user->email);
-        $manualKey = $secret;
+        $qrCode = $service->getQrCodeUrl($secret, $user->email);
+        $secret = $secret;
 
-        return view('client.two-factor.setup', compact('qrCodeUrl', 'manualKey'));
+        return view('client.two-factor.setup', compact('qrCode', 'secret'));
     }
 
     public function confirm(Request $request)

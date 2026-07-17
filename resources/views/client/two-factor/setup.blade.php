@@ -38,6 +38,11 @@
                 <input type="text" name="code" maxlength="6" pattern="[0-9]{6}" required class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 text-center font-mono text-2xl tracking-[0.5em] placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="000000" autofocus>
                 @error('code') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
             </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Your Password</label>
+                <input type="password" name="password" required class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="Enter your password">
+                @error('password') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+            </div>
             <button type="submit" class="btn-primary w-full py-3 rounded-xl text-sm font-semibold text-white shadow-lg shadow-brand-500/20">
                 <i data-lucide="shield-check" class="w-4 h-4 inline mr-2"></i> Enable 2FA
             </button>
