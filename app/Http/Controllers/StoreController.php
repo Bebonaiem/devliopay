@@ -34,6 +34,14 @@ class StoreController extends Controller
             ->with(['category', 'pricing.currencies', 'configOptions'])
             ->firstOrFail();
 
-        return view('store.show', compact('product'));
+        $addons = \App\Models\Addon::where('is_active', true)
+            ->where(function ($query) use ($product) {
+                $query->whereNull('server_extension')
+                    ->orWhere('server_extension', $product->server_extension);
+            })
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('store.show', compact('product', 'addons'));
     }
 }

@@ -125,6 +125,30 @@
                     <input type="hidden" name="currency_id" id="currency_id" value="{{ $firstPlanCurrency?->id }}">
                     @endif
 
+                    {{-- Addons --}}
+                    @if(isset($addons) && count($addons) > 0)
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Addons</label>
+                        <div class="space-y-2" x-data="{ selectedAddons: [], total: {{ $firstPlanAmount ?? 0 }} }">
+                            @foreach($addons as $addon)
+                            <label class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-brand-500/30 cursor-pointer transition-all has-[:checked]:border-brand-500/50 has-[:checked]:bg-brand-500/5">
+                                <input type="checkbox" name="addon_ids[]" value="{{ $addon->id }}" class="sr-only" @change="selectedAddons.includes({{ $addon->id }}) ? selectedAddons = selectedAddons.filter(a => a !== {{ $addon->id }}) : selectedAddons.push({{ $addon->id }})">
+                                <div class="w-4 h-4 rounded border-2 border-gray-600 flex items-center justify-center transition-colors" :class="selectedAddons.includes({{ $addon->id }}) ? 'border-brand-500 bg-brand-500' : ''">
+                                    <svg x-show="selectedAddons.includes({{ $addon->id }})" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium">{{ $addon->name }}</p>
+                                    @if($addon->description)
+                                    <p class="text-[11px] text-gray-500">{{ $addon->description }}</p>
+                                    @endif
+                                </div>
+                                <span class="text-sm font-semibold text-gray-300">{{ $defaultCurrencySymbol }}{{ number_format($addon->price, 2) }}<span class="text-gray-500 font-normal text-xs">/{{ $addon->billing_interval === 'one_time' ? 'once' : $addon->billing_interval }}</span></span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- Qty --}}
                     @if($product->allow_quantity !== 'no')
                     <div>

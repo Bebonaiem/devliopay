@@ -24,6 +24,9 @@ class CartController extends Controller
         $items = [];
         $subtotal = 0;
 
+        $allAddonIds = collect($cart)->pluck('addon_ids')->flatten()->filter()->unique()->values()->all();
+        $addonsMap = \App\Models\Addon::whereIn('id', $allAddonIds)->get()->keyBy('id');
+
         foreach ($cart as $key => $item) {
             $product = Product::with('pricing.currencies')->find($item['product_id']);
             $pricing = ProductPricing::with('currencies')->find($item['pricing_id']);
@@ -37,6 +40,10 @@ class CartController extends Controller
                 $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;
                 $qty = $item['quantity'] ?? 1;
                 $currencySymbol = $pivotCurrency?->symbol ?? $defaultCurrencySymbol;
+
+                $selectedAddons = collect($item['addon_ids'] ?? [])->map(fn ($id) => $addonsMap[$id] ?? null)->filter()->values()->all();
+                $addonsTotal = collect($selectedAddons)->sum('price');
+
                 $items[$key] = [
                     'product' => $product,
                     'pricing' => $pricing,
@@ -45,8 +52,10 @@ class CartController extends Controller
                     'quantity' => $qty,
                     'line_total' => ($price * $qty) + $setupFee,
                     'currency_symbol' => $currencySymbol,
+                    'addons' => $selectedAddons,
+                    'addons_total' => $addonsTotal,
                 ];
-                $subtotal += ($price * $qty) + $setupFee;
+                $subtotal += ($price * $qty) + $setupFee + $addonsTotal;
             }
         }
 
@@ -74,6 +83,8 @@ class CartController extends Controller
             'product_id' => 'required|exists:products,id',
             'pricing_id' => 'required|exists:product_pricing,id',
             'currency_id' => 'nullable|exists:currencies,id',
+            'addon_ids' => 'nullable|array',
+            'addon_ids.*' => 'exists:addons,id',
         ]);
 
         $cart = session()->get('cart', []);
@@ -89,6 +100,7 @@ class CartController extends Controller
                     ->with('error', 'This item is already in your cart.');
             }
             $cart[$key]['currency_id'] = $request->currency_id ?? null;
+            $cart[$key]['addon_ids'] = $request->addon_ids ?? [];
         } else {
             $cart[$key] = [
                 'product_id' => $request->product_id,
@@ -96,6 +108,7 @@ class CartController extends Controller
                 'quantity' => $quantity,
                 'currency_id' => $request->currency_id ?? null,
                 'config' => $request->only(['hostname', 'os_type', 'server_name']),
+                'addon_ids' => $request->addon_ids ?? [],
             ];
         }
 
@@ -166,6 +179,10 @@ class CartController extends Controller
         $total = 0;
         $orderItems = [];
         $pricingCurrency = null;
+        $cartAddons = [];
+
+        $allAddonIds = collect($cart)->pluck('addon_ids')->flatten()->filter()->unique()->values()->all();
+        $addonsMap = \App\Models\Addon::whereIn('id', $allAddonIds)->get()->keyBy('id');
 
         foreach ($cart as $key => $item) {
             $pricing = ProductPricing::with('currencies', 'product')->find($item['pricing_id']);
@@ -185,6 +202,9 @@ class CartController extends Controller
                 $pricingCurrency = $pivotCurrency;
             }
 
+            $itemAddons = collect($item['addon_ids'] ?? [])->map(fn ($id) => $addonsMap[$id] ?? null)->filter()->values()->all();
+            $addonsTotal = collect($itemAddons)->sum('price');
+
             $orderItems[] = [
                 'product_id' => $item['product_id'],
                 'pricing_id' => $item['pricing_id'],
@@ -196,7 +216,9 @@ class CartController extends Controller
                 'pricing' => $pricing,
             ];
 
-            $total += ($price + $setupFee) * ($item['quantity'] ?? 1);
+            $cartAddons[$key] = $itemAddons;
+
+            $total += ($price + $setupFee) * ($item['quantity'] ?? 1) + $addonsTotal;
         }
 
         if (empty($orderItems)) {
@@ -223,7 +245,7 @@ class CartController extends Controller
         $invoice = null;
         $serviceIds = [];
 
-        DB::transaction(function () use ($user, $totalWithTax, $subtotal, $taxAmount, $taxRate, $pricingCurrency, $orderItems, $promoCode, &$order, &$invoice, &$serviceIds) {
+        DB::transaction(function () use ($user, $totalWithTax, $subtotal, $taxAmount, $taxRate, $pricingCurrency, $orderItems, $cartAddons, $promoCode, &$order, &$invoice, &$serviceIds) {
             $order = Order::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
@@ -251,7 +273,7 @@ class CartController extends Controller
             app(NotificationService::class)->notify($user, new InvoiceCreated($invoice));
 
             $order->load('items.product', 'items.pricing');
-            foreach ($order->items as $item) {
+            foreach ($order->items as $index => $item) {
                 $product = $item->product;
                 $service = Service::create([
                     'user_id' => $user->id,
@@ -263,10 +285,31 @@ class CartController extends Controller
                     'server_extension' => $product?->server_extension ?? null,
                 ]);
                 $serviceIds[] = $service->id;
+
+                $itemAddons = $cartAddons[array_keys($cartAddons)[$index]] ?? [];
+                foreach ($itemAddons as $addon) {
+                    $service->addons()->attach($addon->id, [
+                        'price' => $addon->price,
+                        'status' => 'pending',
+                        'activated_at' => null,
+                        'next_billing_at' => null,
+                    ]);
+                }
             }
 
             if (! empty($serviceIds) && ! $invoice->service_id) {
                 $invoice->update(['service_id' => $serviceIds[0]]);
+            }
+
+            foreach ($cartAddons as $itemAddons) {
+                foreach ($itemAddons as $addon) {
+                    \App\Models\InvoiceItem::create([
+                        'invoice_id' => $invoice->id,
+                        'description' => 'Addon: '.$addon->name,
+                        'amount' => $addon->price,
+                        'quantity' => 1,
+                    ]);
+                }
             }
 
             // Apply promo code usage
@@ -295,13 +338,23 @@ class CartController extends Controller
         $total = 0;
         $productIds = [];
 
+        $allAddonIds = collect($cart)->pluck('addon_ids')->flatten()->filter()->unique()->values()->all();
+        $addonsMap = \App\Models\Addon::whereIn('id', $allAddonIds)->get()->keyBy('id');
+
         foreach ($cart as $item) {
             $pricing = ProductPricing::with('currencies')->find($item['pricing_id']);
             if (! $pricing) {
                 continue;
             }
-            $price = $pricing->currencies->first()?->pivot->amount ?? 0;
-            $total += $price * ($item['quantity'] ?? 1);
+            $selectedCurrencyId = $item['currency_id'] ? (int) $item['currency_id'] : null;
+            $pivotCurrency = $selectedCurrencyId
+                ? $pricing->currencies->first(fn ($c) => $c->id === $selectedCurrencyId)
+                : $pricing->currencies->first();
+            $price = $pivotCurrency?->pivot->amount ?? 0;
+            $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;
+            $itemAddons = collect($item['addon_ids'] ?? [])->map(fn ($id) => $addonsMap[$id] ?? null)->filter()->values()->all();
+            $addonsTotal = collect($itemAddons)->sum('price');
+            $total += ($price + $setupFee) * ($item['quantity'] ?? 1) + $addonsTotal;
             $productIds[] = $item['product_id'];
         }
 

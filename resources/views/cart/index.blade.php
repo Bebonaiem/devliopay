@@ -45,6 +45,11 @@
                         @if(($item['setup_fee'] ?? 0) > 0)
                         <div class="text-[11px] text-amber-400">+{{ $itemSymbol }}{{ number_format($item['setup_fee'], 2) }} setup</div>
                         @endif
+                        @if(!empty($item['addons']))
+                        @foreach($item['addons'] as $addon)
+                        <div class="text-[11px] text-brand-400">+{{ $itemSymbol }}{{ number_format($addon->price, 2) }} {{ $addon->name }}</div>
+                        @endforeach
+                        @endif
                         </div>
                         <form id="remove-cart-{{ $key }}" method="POST" action="{{ route('cart.remove', $key) }}">
                             @csrf

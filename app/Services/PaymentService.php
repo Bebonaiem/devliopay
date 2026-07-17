@@ -42,7 +42,6 @@ class PaymentService
         if ($invoice->service) {
             $services = collect([$invoice->service]);
         } else {
-            // Find pending services linked to this invoice's order
             $orderId = $invoice->service?->order_id
                 ?? $invoice->user->services()->where('status', 'pending')->first()?->order_id
                 ?? 0;
@@ -64,6 +63,7 @@ class PaymentService
                         'activated_at' => now(),
                         'next_billing_at' => $billingService->calculateNextBilling($service),
                     ]);
+                    $this->activatePendingAddons($service);
                 } else {
                     Log::error('Service provisioning failed', [
                         'invoice_id' => $invoice->id,
@@ -72,6 +72,29 @@ class PaymentService
                     ]);
                 }
             }
+        }
+    }
+
+    private function activatePendingAddons(\App\Models\Service $service): void
+    {
+        $pendingAddons = $service->addons()->wherePivot('status', 'pending')->get();
+
+        foreach ($pendingAddons as $addon) {
+            $service->addons()->updateExistingPivot($addon->id, [
+                'status' => 'active',
+                'activated_at' => now(),
+                'next_billing_at' => $addon->billing_interval === 'one_time' ? null : $this->calculateAddonNextBilling($addon),
+            ]);
+
+            if ($service->server_extension === 'pterodactyl' && ($service->server_properties['server_id'] ?? null)) {
+                $this->applyAddonResources($service, $addon);
+            }
+
+            Log::info('Addon activated with service', [
+                'service_id' => $service->id,
+                'addon_id' => $addon->id,
+                'addon_name' => $addon->name,
+            ]);
         }
     }
 
