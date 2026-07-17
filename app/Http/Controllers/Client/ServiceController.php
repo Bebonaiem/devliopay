@@ -154,81 +154,78 @@ class ServiceController extends Controller
             return back()->with('error', 'This addon is no longer available');
         }
 
-        if ($service->addons()->where('addon_id', $addon->id)->exists()) {
+        if ($service->addons()->where('addon_id', $addon->id)->where('status', 'active')->exists()) {
             return back()->with('error', 'You already have this addon');
         }
 
-        $service->addons()->attach($addon->id, [
+        $existingPending = $service->addons()->where('addon_id', $addon->id)->where('status', 'pending')->first();
+        if ($existingPending) {
+            $invoice = \App\Models\Invoice::where('service_addon_id', $existingPending->id)->where('status', 'pending')->first();
+            if ($invoice) {
+                return redirect()->route('client.invoices.show', $invoice)->with('info', 'You have a pending invoice for this addon');
+            }
+        }
+
+        $currency = $service->pricing->currencies->first() ?? \App\Models\Currency::where('is_default', true)->first();
+
+        $taxAmount = 0;
+        $taxRate = null;
+        $user = $service->user;
+        if ($user) {
+            $taxRate = \App\Models\TaxRate::findByLocation($user->country, $user->state, $user->zip_code);
+            if ($taxRate) {
+                $taxAmount = $taxRate->calculateTax($addon->price);
+            }
+        }
+
+        $total = $taxRate && $taxRate->is_inclusive ? $addon->price : $addon->price + $taxAmount;
+
+        $serviceAddonId = $service->addons()->attach($addon->id, [
             'price' => $addon->price,
-            'status' => 'active',
-            'activated_at' => now(),
-            'next_billing_at' => $addon->billing_interval === 'one_time' ? null : $this->calculateNextBilling($addon),
+            'status' => 'pending',
         ]);
 
-        if ($service->server_extension === 'pterodactyl' && $service->server_properties['server_id'] ?? null) {
-            $this->applyAddonResources($service, $addon);
-        }
+        $serviceAddon = \App\Models\ServiceAddon::where('service_id', $service->id)->where('addon_id', $addon->id)->where('status', 'pending')->latest()->first();
 
-        ActivityLogService::log('addon_purchased', $service, 'Client purchased addon: '.$addon->name);
+        $invoice = \App\Models\Invoice::create([
+            'user_id' => $service->user_id,
+            'service_id' => $service->id,
+            'addon_id' => $addon->id,
+            'service_addon_id' => $serviceAddon->id,
+            'status' => 'pending',
+            'subtotal' => $addon->price,
+            'tax' => $taxAmount,
+            'total' => $total,
+            'currency_id' => $currency?->id,
+            'tax_rate_id' => $taxRate?->id,
+            'due_at' => now()->addDays(7),
+        ]);
 
-        return redirect()->route('client.services.show', $service)
-            ->with('success', 'Addon "'.$addon->name.'" has been added to your service');
-    }
+        \App\Models\InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'description' => 'Addon: '.$addon->name.' - '.$service->product->name,
+            'amount' => $addon->price,
+            'quantity' => 1,
+        ]);
 
-    private function calculateNextBilling(\App\Models\Addon $addon): \Carbon\Carbon
-    {
-        $period = $addon->billing_period ?? 1;
-        return match ($addon->billing_interval) {
-            'month' => now()->addMonths($period),
-            'quarter' => now()->addMonths($period * 3),
-            'semi_annual' => now()->addMonths($period * 6),
-            'year' => now()->addYears($period),
-            default => now()->addMonth(),
-        };
-    }
-
-    private function applyAddonResources(Service $service, \App\Models\Addon $addon): void
-    {
-        if (!$addon->extra_ram && !$addon->extra_disk && !$addon->extra_cpu && !$addon->extra_databases && !$addon->extra_allocations && !$addon->extra_backups) {
-            return;
-        }
-
-        try {
-            $serverId = $service->server_properties['server_id'] ?? null;
-            if (!$serverId) {
-                return;
-            }
-
-            $provisioning = new \App\Services\Servers\PterodactylServer;
-            $result = $provisioning->getServerInfo($service);
-
-            if (!$result['success']) {
-                \Illuminate\Support\Facades\Log::error('Failed to get server info for addon upgrade', [
-                    'service_id' => $service->id,
-                    'error' => $result['error'],
-                ]);
-                return;
-            }
-
-            $upgradeResult = $provisioning->upgradeServer($service, [], [
-                'ram' => ($result['memory'] ?? 0) + $addon->extra_ram,
-                'disk' => ($result['disk'] ?? 0) + $addon->extra_disk,
-                'cpu' => ($result['cpu'] ?? 0) + $addon->extra_cpu,
-            ]);
-
-            if (!$upgradeResult['success']) {
-                \Illuminate\Support\Facades\Log::error('Failed to upgrade server resources for addon', [
-                    'service_id' => $service->id,
-                    'addon_id' => $addon->id,
-                    'error' => $upgradeResult['error'],
-                ]);
-            }
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Exception applying addon resources', [
-                'service_id' => $service->id,
-                'addon_id' => $addon->id,
-                'error' => $e->getMessage(),
+        if ($taxRate && $taxAmount > 0) {
+            \App\Models\InvoiceItem::create([
+                'invoice_id' => $invoice->id,
+                'description' => "Tax ({$taxRate->name} - {$taxRate->rate}%)",
+                'amount' => $taxAmount,
+                'quantity' => 1,
             ]);
         }
+
+        app(\App\Services\NotificationService::class)->notify(
+            $service->user,
+            new \App\Notifications\InvoiceCreated($invoice)
+        );
+
+        ActivityLogService::log('addon_invoice_created', $service, 'Invoice created for addon: '.$addon->name.' - Total: '.$total);
+
+        return redirect()->route('client.invoices.show', $invoice)
+            ->with('success', 'Invoice created for "'.$addon->name.'". Please complete your payment.');
     }
+
 }

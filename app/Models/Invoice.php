@@ -16,6 +16,8 @@ class Invoice extends Model
         'number',
         'user_id',
         'service_id',
+        'addon_id',
+        'service_addon_id',
         'status',
         'subtotal',
         'tax',
@@ -74,6 +76,16 @@ class Invoice extends Model
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
+    }
+
+    public function addon(): BelongsTo
+    {
+        return $this->belongsTo(Addon::class);
+    }
+
+    public function serviceAddon()
+    {
+        return $this->belongsTo(ServiceAddon::class, 'service_addon_id');
     }
 
     public function isPaid(): bool
