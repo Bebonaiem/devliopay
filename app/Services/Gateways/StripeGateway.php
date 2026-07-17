@@ -177,7 +177,7 @@ class StripeGateway implements GatewayInterface
                             'currency' => strtolower(config('app.currency', 'usd')),
                             'product_data' => [
                                 'name' => 'Credit Deposit',
-                                'description' => 'Add $'.number_format($amount, 2).' to your account balance',
+                                'description' => 'Add '.\App\Models\Currency::defaultSymbol().number_format($amount, 2).' to your account balance',
                             ],
                             'unit_amount' => (int) ($amount * 100),
                         ],

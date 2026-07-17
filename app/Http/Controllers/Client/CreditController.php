@@ -170,7 +170,7 @@ class CreditController extends Controller
             $creditService = new CreditService;
             $creditService->deposit($user, $amount, 'Credit deposit via '.ucfirst($gateway));
 
-            return $this->popupOrRedirect($isPopup, 'client.credits.index', '$'.number_format($amount, 2).' has been added to your account balance!', 'success');
+            return $this->popupOrRedirect($isPopup, 'client.credits.index', \App\Models\Currency::defaultSymbol().number_format($amount, 2).' has been added to your account balance!', 'success');
         }
 
         return $this->popupOrRedirect($isPopup, 'client.credits.index', 'Invalid deposit amount.', 'error');

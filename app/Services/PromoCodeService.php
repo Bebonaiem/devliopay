@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Currency;
 use App\Models\PromoCode;
 
 class PromoCodeService
@@ -21,7 +22,7 @@ class PromoCodeService
         if ($cartTotal < $promo->min_amount) {
             return [
                 'valid' => false,
-                'error' => 'Minimum order amount is $'.number_format($promo->min_amount, 2),
+                'error' => 'Minimum order amount is '.Currency::defaultSymbol().number_format($promo->min_amount, 2),
             ];
         }
 

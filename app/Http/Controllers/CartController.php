@@ -304,7 +304,7 @@ class CartController extends Controller
             session()->put('promo_discount', $result['discount']);
 
             return redirect()->route('cart.index')
-                ->with('success', 'Promo code applied! You save $'.number_format($result['discount'], 2));
+                ->with('success', 'Promo code applied! You save '.Currency::defaultSymbol().number_format($result['discount'], 2));
         }
 
         return redirect()->route('cart.index')

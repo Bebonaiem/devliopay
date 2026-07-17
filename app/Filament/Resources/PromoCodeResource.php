@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PromoCodeResource\Pages;
+use App\Models\Currency;
 use App\Models\PromoCode;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -85,7 +86,7 @@ class PromoCodeResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => $record->type === 'percentage' ? $state.'%' : '$'.number_format($state, 2)),
+                    ->formatStateUsing(fn ($state, $record) => $record->type === 'percentage' ? $state.'%' : Currency::defaultSymbol().number_format($state, 2)),
                 Tables\Columns\TextColumn::make('used_count')
                     ->label('Uses')
                     ->sortable(),

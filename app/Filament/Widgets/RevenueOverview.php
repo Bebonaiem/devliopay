@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Service;
@@ -22,12 +23,14 @@ class RevenueOverview extends StatsOverviewWidget
         $pendingInvoices = Invoice::where('status', 'pending')->count();
         $totalOrders = Order::count();
 
+        $symbol = Currency::defaultSymbol();
+
         return [
-            Stat::make('Total Revenue', '$'.number_format($totalRevenue, 2))
+            Stat::make('Total Revenue', $symbol.number_format($totalRevenue, 2))
                 ->description('All time')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
-            Stat::make('Monthly Revenue', '$'.number_format($monthlyRevenue, 2))
+            Stat::make('Monthly Revenue', $symbol.number_format($monthlyRevenue, 2))
                 ->description('This month')
                 ->descriptionIcon('heroicon-m-calendar')
                 ->color('info'),
