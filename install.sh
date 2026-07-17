@@ -82,7 +82,7 @@ echo -e "${YELLOW}[9/12] Environment Configuration${NC}"
 cp .env.example .env
 
 # Generate app key
-php artisan key:force --no-interaction
+php artisan key:generate --force --no-interaction
 
 # Configure database
 touch database/database.sqlite
