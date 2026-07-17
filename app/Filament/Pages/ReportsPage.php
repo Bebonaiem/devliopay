@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -34,6 +35,8 @@ class ReportsPage extends Page implements HasForms
 
     public array $stats = [];
 
+    public string $currencySymbol = '$';
+
     public array $revenueByMonth = [];
 
     public array $topProducts = [];
@@ -46,6 +49,7 @@ class ReportsPage extends Page implements HasForms
 
     public function mount(): void
     {
+        $this->currencySymbol = Setting::get('default_currency_symbol', '$');
         $this->data = [
             'start_date' => now()->subDays(30)->format('Y-m-d'),
             'end_date' => now()->format('Y-m-d'),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AddonResource\Pages;
 use App\Filament\Resources\AddonResource\RelationManagers;
 use App\Models\Addon;
+use App\Models\Currency;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -94,7 +95,7 @@ class AddonResource extends Resource
                 Tables\Columns\TextColumn::make('category.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money('USD')
+                    ->money(Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('billing_interval')
                     ->formatStateUsing(fn ($state) => ucfirst(str_replace('_', ' ', $state))),

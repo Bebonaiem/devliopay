@@ -29,7 +29,7 @@
                             <td class="px-6 py-4 text-sm font-semibold">#{{ $order->order_number ?? $order->id }}</td>
                             <td class="px-6 py-4 text-sm text-gray-300">{{ $order->product->name ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-400">{{ $order->created_at ? $order->created_at->format('M j, Y') : '-' }}</td>
-                            <td class="px-6 py-4 text-sm font-semibold">${{ number_format($order->total ?? 0, 2) }}</td>
+                            <td class="px-6 py-4 text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($order->total ?? 0, 2) }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider
                                     {{ ($order->status ?? '') === 'completed' ? 'bg-emerald-500/10 text-emerald-400' : '' }}

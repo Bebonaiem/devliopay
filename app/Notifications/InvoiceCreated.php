@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Currency;
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -25,10 +26,13 @@ class InvoiceCreated extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        $symbol = Currency::defaultSymbol();
+
         return $this->buildMailMessage(
             data: [
                 'name' => $notifiable->name,
                 'invoice_number' => $this->invoice->number,
+                'currency_symbol' => $symbol,
                 'amount' => number_format($this->invoice->total, 2),
                 'due_date' => $this->invoice->due_at->format('M d, Y'),
                 'url' => route('client.invoices.show', $this->invoice),
@@ -38,7 +42,7 @@ class InvoiceCreated extends Notification
             fallbackLines: [
                 'A new invoice has been generated for your account.',
                 'Invoice Number: '.$this->invoice->number,
-                'Amount Due: $'.number_format($this->invoice->total, 2),
+                'Amount Due: '.$symbol.number_format($this->invoice->total, 2),
                 'Due Date: '.$this->invoice->due_at->format('M d, Y'),
                 'Please make payment before the due date to avoid service interruption.',
             ],
@@ -51,7 +55,7 @@ class InvoiceCreated extends Notification
     {
         return [
             'title' => 'Invoice Created',
-            'message' => 'Invoice #'.$this->invoice->number.' for $'.number_format($this->invoice->total, 2).' has been generated.',
+            'message' => 'Invoice #'.$this->invoice->number.' for '.Currency::defaultSymbol().number_format($this->invoice->total, 2).' has been generated.',
             'invoice_id' => $this->invoice->id,
             'invoice_number' => $this->invoice->number,
             'amount' => $this->invoice->total,

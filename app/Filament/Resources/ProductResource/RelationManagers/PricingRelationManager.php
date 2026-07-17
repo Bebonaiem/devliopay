@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Models\Currency;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -48,7 +49,7 @@ class PricingRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('interval')->sortable(),
                 Tables\Columns\TextColumn::make('billing_period')->sortable(),
                 Tables\Columns\TextColumn::make('currencies.pivot.amount')
-                    ->money(fn ($state) => 'USD')
+                    ->money(fn ($state) => Currency::defaultCode())
                     ->label('Price'),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
             ])

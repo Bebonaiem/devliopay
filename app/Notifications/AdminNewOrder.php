@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Currency;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -27,6 +28,8 @@ class AdminNewOrder extends Notification
     {
         $user = $this->order->user;
 
+        $symbol = Currency::defaultSymbol();
+
         return $this->buildMailMessage(
             data: [
                 'admin_name' => $notifiable->name,
@@ -34,6 +37,7 @@ class AdminNewOrder extends Notification
                 'customer_name' => $user->name,
                 'customer_email' => $user->email,
                 'product_name' => $this->order->product->name ?? 'N/A',
+                'currency_symbol' => $symbol,
                 'amount' => number_format($this->order->total, 2),
                 'status' => $this->order->status,
             ],
@@ -43,7 +47,7 @@ class AdminNewOrder extends Notification
                 'A new order has been placed.',
                 "Order: #{$this->order->number}",
                 "Customer: {$user->name} ({$user->email})",
-                'Amount: $'.number_format($this->order->total, 2),
+                'Amount: '.$symbol.number_format($this->order->total, 2),
                 'Status: '.ucfirst($this->order->status),
             ],
             fallbackActionUrl: url("/admin/orders/{$this->order->id}/edit"),
@@ -55,7 +59,7 @@ class AdminNewOrder extends Notification
     {
         return [
             'title' => 'New Order',
-            'message' => 'Order #'.$this->order->number.' from '.$this->order->user->name.'. Total: $'.number_format($this->order->total, 2),
+            'message' => 'Order #'.$this->order->number.' from '.$this->order->user->name.'. Total: '.Currency::defaultSymbol().number_format($this->order->total, 2),
             'order_id' => $this->order->id,
             'order_number' => $this->order->number,
         ];

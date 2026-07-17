@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Currency;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -25,11 +26,14 @@ class OrderCompleted extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        $symbol = Currency::defaultSymbol();
+
         return $this->buildMailMessage(
             data: [
                 'name' => $notifiable->name,
                 'order_number' => $this->order->number,
                 'product_name' => $this->order->product->name ?? 'N/A',
+                'currency_symbol' => $symbol,
                 'amount' => number_format($this->order->total, 2),
                 'status' => $this->order->status,
                 'url' => route('client.orders.show', $this->order),
@@ -40,7 +44,7 @@ class OrderCompleted extends Notification
                 'Your order has been placed successfully.',
                 'Order: #'.$this->order->number,
                 'Product: '.($this->order->product->name ?? 'N/A'),
-                'Amount: $'.number_format($this->order->total, 2),
+                'Amount: '.$symbol.number_format($this->order->total, 2),
                 "You'll receive an email once your service is active.",
             ],
             fallbackActionUrl: route('client.orders.show', $this->order),
@@ -52,7 +56,7 @@ class OrderCompleted extends Notification
     {
         return [
             'title' => 'Order Confirmed',
-            'message' => 'Order #'.$this->order->number.' has been placed. Total: $'.number_format($this->order->total, 2),
+            'message' => 'Order #'.$this->order->number.' has been placed. Total: '.Currency::defaultSymbol().number_format($this->order->total, 2),
             'order_id' => $this->order->id,
             'order_number' => $this->order->number,
             'amount' => $this->order->total,

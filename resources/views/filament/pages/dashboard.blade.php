@@ -32,7 +32,7 @@
                         <x-heroicon-o-banknotes class="w-5 h-5 text-info-600 dark:text-info-400" />
                     </div>
                     <div>
-                        <div class="text-2xl font-bold">${{ number_format($stats['revenue_month'], 2) }}</div>
+                        <div class="text-2xl font-bold">{{ $currencySymbol }}{{ number_format($stats['revenue_month'], 2) }}</div>
                         <div class="text-xs text-gray-500">Revenue This Month</div>
                     </div>
                 </div>
@@ -117,7 +117,7 @@
                                 y: {
                                     beginAtZero: true,
                                     grid: { color: 'rgba(156, 163, 175, 0.1)' },
-                                    ticks: { color: '#9ca3af', callback: (v) => '$' + v.toLocaleString() },
+                                    ticks: { color: '#9ca3af', callback: (v) => '{{ $currencySymbol }}' + v.toLocaleString() },
                                 },
                                 x: {
                                     grid: { display: false },
@@ -161,7 +161,7 @@
                                 </div>
                                 <div class="text-xs text-gray-500 mt-0.5">{{ $order['user'] }} &middot; {{ $order['date'] }}</div>
                             </div>
-                            <span class="text-sm font-semibold">${{ $order['total'] }}</span>
+                            <span class="text-sm font-semibold">{{ $currencySymbol }}{{ number_format($order['total'], 2) }}</span>
                         </a>
                     @empty
                         <p class="text-sm text-gray-500 text-center py-4">No orders yet</p>

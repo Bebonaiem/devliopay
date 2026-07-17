@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Currency;
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,11 +25,13 @@ class InvoiceOverdue extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $daysOverdue = $this->invoice->due_at ? $this->invoice->due_at->diffInDays(now()) : 0;
+        $symbol = Currency::defaultSymbol();
 
         return $this->buildMailMessage(
             data: [
                 'name' => $notifiable->name,
                 'invoice_number' => $this->invoice->number,
+                'currency_symbol' => $symbol,
                 'amount' => number_format($this->invoice->total, 2),
                 'due_date' => $this->invoice->due_at->format('M d, Y'),
                 'days_overdue' => $daysOverdue,
@@ -38,7 +41,7 @@ class InvoiceOverdue extends Notification
             fallbackGreeting: 'Payment Overdue',
             fallbackLines: [
                 "Your invoice #{$this->invoice->number} is {$daysOverdue} day(s) overdue.",
-                'Amount Due: $'.number_format($this->invoice->total, 2),
+                'Amount Due: '.$symbol.number_format($this->invoice->total, 2),
                 'Due Date: '.$this->invoice->due_at->format('M d, Y'),
                 'Please pay as soon as possible to avoid service suspension.',
             ],
@@ -53,7 +56,7 @@ class InvoiceOverdue extends Notification
 
         return [
             'title' => 'Invoice Overdue',
-            'message' => 'Invoice #'.$this->invoice->number.' is '.$daysOverdue.' day(s) overdue. Amount due: $'.number_format($this->invoice->total, 2),
+            'message' => 'Invoice #'.$this->invoice->number.' is '.$daysOverdue.' day(s) overdue. Amount due: '.Currency::defaultSymbol().number_format($this->invoice->total, 2),
             'invoice_id' => $this->invoice->id,
             'invoice_number' => $this->invoice->number,
             'amount' => $this->invoice->total,

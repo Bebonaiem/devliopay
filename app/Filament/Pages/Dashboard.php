@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\TicketThread;
 use App\Models\User;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -12,6 +13,8 @@ use Filament\Pages\Dashboard as BaseDashboard;
 class Dashboard extends BaseDashboard
 {
     public array $stats = [];
+
+    public string $currencySymbol = '$';
 
     public array $recentOrders = [];
 
@@ -23,6 +26,7 @@ class Dashboard extends BaseDashboard
 
     public function mount(): void
     {
+        $this->currencySymbol = Setting::get('default_currency_symbol', '$');
         $this->loadStats();
         $this->loadRecentOrders();
         $this->loadRecentTickets();

@@ -35,4 +35,14 @@ class Currency extends Model
     {
         return $query->where('is_default', true);
     }
+
+    public static function defaultSymbol(): string
+    {
+        return static::where('is_default', true)->first()?->symbol ?? '$';
+    }
+
+    public static function defaultCode(): string
+    {
+        return static::where('is_default', true)->first()?->code ?? 'USD';
+    }
 }

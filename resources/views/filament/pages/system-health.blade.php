@@ -11,7 +11,7 @@
             </div>
             <div class="bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm">
                 <div class="text-sm text-gray-500">Revenue This Month</div>
-                <div class="text-2xl font-bold">${{ number_format($stats['revenue_this_month'], 2) }}</div>
+                <div class="text-2xl font-bold">{{ $currencySymbol }}{{ number_format($stats['revenue_this_month'], 2) }}</div>
             </div>
             <div class="bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm">
                 <div class="text-sm text-gray-500">Pending Invoices</div>
@@ -30,11 +30,11 @@
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-600 dark:text-gray-400">This Month</span>
-                        <span class="font-semibold">${{ number_format($stats['revenue_this_month'], 2) }}</span>
+                        <span class="font-semibold">{{ $currencySymbol }}{{ number_format($stats['revenue_this_month'], 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-600 dark:text-gray-400">Last Month</span>
-                        <span class="font-semibold">${{ number_format($stats['revenue_last_month'], 2) }}</span>
+                        <span class="font-semibold">{{ $currencySymbol }}{{ number_format($stats['revenue_last_month'], 2) }}</span>
                     </div>
                     @php $change = $stats['revenue_last_month'] > 0 ? (($stats['revenue_this_month'] - $stats['revenue_last_month']) / $stats['revenue_last_month']) * 100 : 0; @endphp
                     <div class="flex justify-between items-center">
@@ -56,7 +56,7 @@
                                 <span class="text-gray-500"> - {{ $order['user'] }}</span>
                             </div>
                             <div class="text-right">
-                                <span class="font-medium">${{ number_format($order['total'], 2) }}</span>
+                                <span class="font-medium">{{ $currencySymbol }}{{ number_format($order['total'], 2) }}</span>
                                 <span class="text-xs ml-1 px-2 py-0.5 rounded-full
                                     {{ $order['status'] === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' }}">
                                     {{ ucfirst($order['status']) }}

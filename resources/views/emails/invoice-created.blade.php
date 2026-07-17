@@ -10,7 +10,7 @@
 </tr>
 <tr>
 <td style="padding-bottom:12px;"><span style="color:#94a3b8;font-size:13px;">Amount Due</span></td>
-<td style="padding-bottom:12px;text-align:right;"><span style="color:#f59e0b;font-size:20px;font-weight:700;">${amount}</span></td>
+<td style="padding-bottom:12px;text-align:right;"><span style="color:#f59e0b;font-size:20px;font-weight:700;">{currency_symbol}{amount}</span></td>
 </tr>
 <tr>
 <td><span style="color:#94a3b8;font-size:13px;">Due Date</span></td>

@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold">${{ number_format($invoice->total ?? 0, 2) }}</span>
+                        <span class="text-sm font-bold">{{ $defaultCurrencySymbol }}{{ number_format($invoice->total ?? 0, 2) }}</span>
                         <i data-lucide="chevron-right" class="w-5 h-5 text-gray-600 group-hover:text-brand-400 transition-colors flex-shrink-0"></i>
                     </div>
                 </div>

@@ -49,7 +49,7 @@
                 </div>
                 <span class="text-xs font-medium text-gray-500">Total Revenue</span>
             </div>
-            <div class="text-2xl font-bold">${{ $this->getTotalRevenue() }}</div>
+            <div class="text-2xl font-bold">{{ $currencySymbol }}{{ $this->getTotalRevenue() }}</div>
         </div>
 
         <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
@@ -59,7 +59,7 @@
                 </div>
                 <span class="text-xs font-medium text-gray-500">This Month</span>
             </div>
-            <div class="text-2xl font-bold">${{ $this->getMonthlyRevenue() }}</div>
+            <div class="text-2xl font-bold">{{ $currencySymbol }}{{ $this->getMonthlyRevenue() }}</div>
         </div>
 
         <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
@@ -69,7 +69,7 @@
                 </div>
                 <span class="text-xs font-medium text-gray-500">Avg Invoice</span>
             </div>
-            <div class="text-2xl font-bold">${{ $this->getAvgInvoiceValue() }}</div>
+            <div class="text-2xl font-bold">{{ $currencySymbol }}{{ $this->getAvgInvoiceValue() }}</div>
         </div>
 
         <div class="fi-card bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-white/10">
@@ -133,7 +133,7 @@
                                 <div class="h-full rounded-md bg-gradient-to-r from-primary-600 to-primary-400 transition-all duration-500"
                                      style="width: {{ max($percentage, 2) }}%"></div>
                             </div>
-                            <div class="w-20 text-right text-[11px] font-semibold">${{ $row['revenue'] }}</div>
+                            <div class="w-20 text-right text-[11px] font-semibold">{{ $currencySymbol }}{{ $row['revenue'] }}</div>
                         </div>
                     @empty
                         <div class="text-center py-12 text-gray-500 text-sm">No revenue data</div>
@@ -156,7 +156,7 @@
                                 <span class="w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 text-[10px] font-bold flex items-center justify-center">{{ $i + 1 }}</span>
                                 <span class="text-sm font-medium">{{ $product['name'] }}</span>
                             </div>
-                            <span class="text-xs font-semibold">${{ $product['total_revenue'] }}</span>
+                            <span class="text-xs font-semibold">{{ $currencySymbol }}{{ $product['total_revenue'] }}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <div class="flex-1 h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -198,7 +198,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/5">
                             <td class="py-4 px-6 font-mono text-xs">#{{ $order['number'] }}</td>
                             <td class="py-4 px-6">{{ $order['user'] }}</td>
-                            <td class="py-4 px-6 text-right font-semibold">${{ $order['total'] }}</td>
+                            <td class="py-4 px-6 text-right font-semibold">{{ $currencySymbol }}{{ $order['total'] }}</td>
                             <td class="py-4 px-6">
                                 <x-filament::badge :color="match($order['status']) {
                                     'completed' => 'success',

@@ -4,7 +4,7 @@
 <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));border:1px solid rgba(34,197,94,0.3);border-radius:12px;margin-bottom:24px;">
 <tr><td style="padding:24px;text-align:center;">
 <div style="font-size:36px;margin-bottom:8px;">💵</div>
-<span style="color:#22c55e;font-size:18px;font-weight:700;">${amount} Received</span>
+<span style="color:#22c55e;font-size:18px;font-weight:700;">{currency_symbol}{amount} Received</span>
 </td></tr>
 </table>
 

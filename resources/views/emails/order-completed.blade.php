@@ -21,7 +21,7 @@
 </tr>
 <tr>
 <td style="padding-bottom:12px;"><span style="color:#94a3b8;font-size:13px;">Total</span></td>
-<td style="padding-bottom:12px;text-align:right;"><span style="color:#22c55e;font-size:20px;font-weight:700;">${amount}</span></td>
+<td style="padding-bottom:12px;text-align:right;"><span style="color:#22c55e;font-size:20px;font-weight:700;">{currency_symbol}{amount}</span></td>
 </tr>
 <tr>
 <td><span style="color:#94a3b8;font-size:13px;">Status</span></td>

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceUpgradeResource\Pages;
+use App\Models\Currency;
 use App\Models\ServiceUpgrade;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -69,15 +70,15 @@ class ServiceUpgradeResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('price_difference')
                     ->label('Price Diff')
-                    ->money('USD')
+                    ->money(Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('credit_applied')
                     ->label('Credit')
-                    ->money('USD')
+                    ->money(Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount_due')
                     ->label('Amount Due')
-                    ->money('USD')
+                    ->money(Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()

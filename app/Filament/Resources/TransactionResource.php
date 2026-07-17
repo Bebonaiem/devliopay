@@ -36,7 +36,7 @@ class TransactionResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->money(fn ($record) => $record->currency?->code ?? 'USD')
+                    ->money(fn ($record) => $record->currency?->code ?? Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -82,7 +82,7 @@ class TransactionResource extends Resource
                                 Forms\Components\TextInput::make('user.name')->label('Customer')->disabled(),
                                 Forms\Components\TextInput::make('invoice.number')->label('Invoice')->disabled(),
                                 Forms\Components\TextInput::make('amount')
-                                    ->money(fn ($record) => $record->currency?->code ?? 'USD')
+                                    ->money(fn ($record) => $record->currency?->code ?? Currency::defaultCode())
                                     ->disabled(),
                                 Forms\Components\TextInput::make('status')->disabled(),
                                 Forms\Components\TextInput::make('gateway')->disabled(),

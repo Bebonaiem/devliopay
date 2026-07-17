@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
+use App\Models\Currency;
 use App\Models\Order;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -53,9 +54,9 @@ class OrderResource extends Resource
                                 'failed' => 'danger',
                             }),
                         TextEntry::make('total')
-                            ->money('USD'),
+                            ->money(Currency::defaultCode()),
                         TextEntry::make('setup_fee')
-                            ->money('USD')
+                            ->money(Currency::defaultCode())
                             ->label('Setup Fee'),
                         TextEntry::make('currency.code')
                             ->label('Currency'),
@@ -77,9 +78,9 @@ class OrderResource extends Resource
                                 TextEntry::make('quantity')
                                     ->label('Qty'),
                                 TextEntry::make('price')
-                                    ->money('USD'),
+                                    ->money(Currency::defaultCode()),
                                 TextEntry::make('setup_fee')
-                                    ->money('USD')
+                                    ->money(Currency::defaultCode())
                                     ->label('Setup Fee'),
                             ])->columns(5),
                     ]),
@@ -128,7 +129,7 @@ class OrderResource extends Resource
                                         'refunded' => 'info',
                                     }),
                                 TextEntry::make('total')
-                                    ->money('USD'),
+                                    ->money(Currency::defaultCode()),
                                 TextEntry::make('due_at')
                                     ->dateTime()
                                     ->label('Due Date'),
@@ -213,7 +214,7 @@ class OrderResource extends Resource
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->money('USD')
+                    ->money(Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('services_count')
                     ->counts('services')

@@ -130,10 +130,10 @@ class InvoiceResource extends Resource
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->money(fn ($record) => $record->currency?->code ?? 'USD')
+                    ->money(fn ($record) => $record->currency?->code ?? Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tax')
-                    ->money(fn ($record) => $record->currency?->code ?? 'USD')
+                    ->money(fn ($record) => $record->currency?->code ?? Currency::defaultCode())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_at')
                     ->dateTime()

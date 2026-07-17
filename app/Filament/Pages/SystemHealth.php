@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\TicketThread;
 use App\Models\Transaction;
 use App\Models\User;
@@ -26,12 +27,15 @@ class SystemHealth extends Page
 
     public array $stats = [];
 
+    public string $currencySymbol = '$';
+
     public array $recentActivity = [];
 
     public array $systemInfo = [];
 
     public function mount(): void
     {
+        $this->currencySymbol = Setting::get('default_currency_symbol', '$');
         $this->loadStats();
         $this->loadRecentActivity();
         $this->loadSystemInfo();
