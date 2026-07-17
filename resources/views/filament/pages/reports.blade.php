@@ -117,12 +117,12 @@
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;" class="mb-6">
         {{-- Revenue by Month --}}
         <div class="fi-card bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="px-5 py-4 border-b border-gray-200 dark:border-white/10 flex items-center gap-2">
+            <div class="px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-center gap-2">
                 <x-heroicon-o-chart-bar class="w-5 h-5 text-gray-400" />
                 <span class="font-semibold text-sm">Revenue by Month</span>
             </div>
-            <div class="p-5">
-                <div class="space-y-2">
+            <div class="p-6">
+                <div class="space-y-3">
                     @forelse($revenueByMonth as $row)
                         @php
                             $percentage = $this->maxMonthRevenue > 0 ? ($row['raw'] / $this->maxMonthRevenue) * 100 : 0;
@@ -144,11 +144,11 @@
 
         {{-- Top Products --}}
         <div class="fi-card bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10">
-            <div class="px-5 py-4 border-b border-gray-200 dark:border-white/10 flex items-center gap-2">
+            <div class="px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-center gap-2">
                 <x-heroicon-o-trophy class="w-5 h-5 text-gray-400" />
                 <span class="font-semibold text-sm">Top Products</span>
             </div>
-            <div class="p-5">
+            <div class="p-6">
                 @forelse($topProducts as $i => $product)
                     <div class="{{ !$loop->first ? 'mt-4 pt-4 border-t border-gray-100 dark:border-white/5' : '' }}">
                         <div class="flex items-center justify-between mb-2">
@@ -175,7 +175,7 @@
 
     {{-- Recent Orders --}}
     <div class="fi-card bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10">
-        <div class="px-5 py-4 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
+        <div class="px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <x-heroicon-o-shopping-bag class="w-5 h-5 text-gray-400" />
                 <span class="font-semibold text-sm">Recent Orders</span>
