@@ -29,7 +29,7 @@ class CartController extends Controller
             $pricing = ProductPricing::with('currencies')->find($item['pricing_id']);
 
             if ($product && $pricing) {
-                $selectedCurrencyId = $item['currency_id'] ?? null;
+                $selectedCurrencyId = $item['currency_id'] ? (int) $item['currency_id'] : null;
                 $pivotCurrency = $selectedCurrencyId
                     ? $pricing->currencies->first(fn ($c) => $c->id === $selectedCurrencyId)
                     : $pricing->currencies->first();
@@ -175,7 +175,7 @@ class CartController extends Controller
                 continue;
             }
 
-            $selectedCurrencyId = $item['currency_id'] ?? null;
+            $selectedCurrencyId = $item['currency_id'] ? (int) $item['currency_id'] : null;
             $pivotCurrency = $selectedCurrencyId
                 ? $pricing->currencies->first(fn ($c) => $c->id === $selectedCurrencyId)
                 : $pricing->currencies->first();
