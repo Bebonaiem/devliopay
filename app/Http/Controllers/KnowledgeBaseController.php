@@ -9,33 +9,38 @@ class KnowledgeBaseController extends Controller
 {
     public function index(Request $request)
     {
-        $query = KnowledgeBaseArticle::published()->orderBy('sort_order');
+        $articles = KnowledgeBaseArticle::published()
+            ->orderBy('sort_order')
+            ->when($request->search, fn ($q) => $q->search($request->search))
+            ->when($request->category, fn ($q) => $q->where('category', $request->category))
+            ->get();
 
-        if ($request->search) {
-            $query->search($request->search);
-        }
-
-        if ($request->category) {
-            $query->where('category', $request->category);
-        }
-
-        $articles = $query->get();
         $categories = KnowledgeBaseArticle::published()
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+            ->selectRaw('category, COUNT(*) as articles_count')
+            ->groupBy('category')
+            ->orderBy('category')
+            ->get();
 
         return view('knowledgebase.index', compact('articles', 'categories'));
     }
 
     public function show(string $slug)
     {
-        $article = KnowledgeBaseArticle::where('slug', $slug)
-            ->where('is_published', true)
-            ->firstOrFail();
+        $articles = KnowledgeBaseArticle::published()
+            ->where('category', $slug)
+            ->orderBy('sort_order')
+            ->get();
 
-        $article->incrementViews();
+        if ($articles->isEmpty()) {
+            abort(404);
+        }
 
-        return view('knowledgebase.show', compact('article'));
+        $category = (object) [
+            'name' => $slug,
+            'slug' => $slug,
+            'articles_count' => $articles->count(),
+        ];
+
+        return view('knowledgebase.show', compact('category', 'articles'));
     }
 }

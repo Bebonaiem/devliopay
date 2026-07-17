@@ -11,7 +11,7 @@
     </div>
 
     <h1 class="text-2xl sm:text-3xl font-black tracking-tight mb-2">{{ $category->name ?? 'Knowledge Base' }}</h1>
-    <p class="text-sm text-gray-400 mb-8">{{ $category->description ?? 'Browse articles in this category.' }}</p>
+    <p class="text-sm text-gray-400 mb-8">{{ $category->articles_count ?? 0 }} articles in this category.</p>
 
     @if(isset($articles) && count($articles) > 0)
         <div class="space-y-3">
@@ -23,12 +23,12 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <h3 class="text-sm font-semibold group-hover:text-brand-400 transition-colors">{{ $article->title }}</h3>
-                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">{{ Str::limit(strip_tags($article->body ?? $article->content ?? ''), 120) }}</p>
+                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">{{ Str::limit(strip_tags($article->content ?? ''), 120) }}</p>
                     </div>
                     <i data-lucide="chevron-right" x-bind:class="open ? 'rotate-90' : ''" class="w-4 h-4 text-gray-600 group-hover:text-brand-400 transition-all flex-shrink-0"></i>
                 </div>
                 <div x-show="open" x-cloak x-transition class="mt-4 pt-4 border-t border-white/5 text-sm text-gray-300 leading-relaxed prose prose-invert prose-sm max-w-none">
-                    {!! $article->body ?? $article->content ?? 'No content available.' !!}
+                    {!! $article->content ?? 'No content available.' !!}
                 </div>
             </div>
             @endforeach
