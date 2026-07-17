@@ -106,7 +106,7 @@ class UserResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Delete Record')
                     ->modalDescription('Are you sure you want to delete this record? This action cannot be undone.'),
-                Forms\Components\Actions\Action::make('loginAs')
+                Tables\Actions\Action::make('loginAs')
                     ->label('Login As')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->color('warning')
