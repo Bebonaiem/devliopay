@@ -37,6 +37,7 @@ class GeneralSettings extends Page implements HasForms
             'company_logo' => Setting::get('company_logo', ''),
             'company_logo_display' => Setting::get('company_logo_display', 'name_only'),
             'company_favicon' => Setting::get('company_favicon', ''),
+            'company_og_image' => Setting::get('company_og_image', ''),
             'company_footer_text' => Setting::get('company_footer_text', ''),
             'default_currency' => Setting::get('default_currency', 'USD'),
             'default_currency_symbol' => Setting::get('default_currency_symbol', '$'),
@@ -86,6 +87,12 @@ class GeneralSettings extends Page implements HasForms
                             ->default('name_only'),
                         Forms\Components\FileUpload::make('company_favicon')
                             ->label('Favicon')
+                            ->image()
+                            ->disk('public')
+                            ->directory('company')
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('company_og_image')
+                            ->label('OG Image (1200x630 recommended)')
                             ->image()
                             ->disk('public')
                             ->directory('company')

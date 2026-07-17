@@ -11,6 +11,18 @@
     @else
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
     @endif
+    <meta property="og:title" content="@yield('title', $companyName)">
+    <meta property="og:site_name" content="{{ $companyName }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if($companyOgImage)
+        <meta property="og:image" content="{{ $companyOgImage }}">
+    @endif
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', $companyName)">
+    @if($companyOgImage)
+        <meta name="twitter:image" content="{{ $companyOgImage }}">
+    @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">

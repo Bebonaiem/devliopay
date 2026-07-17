@@ -51,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('companyLogo', Setting::get('company_logo', '') ? '/storage/' . ltrim(Setting::get('company_logo', ''), '/') : '');
             $view->with('companyLogoDisplay', Setting::get('company_logo_display', 'name_only'));
             $view->with('companyFavicon', Setting::get('company_favicon', '') ? '/storage/' . ltrim(Setting::get('company_favicon', ''), '/') : '');
+            $view->with('companyOgImage', Setting::get('company_og_image', '') ? '/storage/' . ltrim(Setting::get('company_og_image', ''), '/') : '');
             $view->with('companyEmail', Setting::get('company_email', ''));
             $view->with('companyUrl', Setting::get('company_url', ''));
             $view->with('companyPhone', Setting::get('company_phone', ''));
