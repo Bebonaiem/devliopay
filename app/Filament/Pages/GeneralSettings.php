@@ -102,14 +102,65 @@ class GeneralSettings extends Page implements HasForms
 
                 Forms\Components\Section::make('Currency')
                     ->schema([
-                        Forms\Components\TextInput::make('default_currency')
-                            ->label('Currency Code')
+                        Forms\Components\Select::make('default_currency')
+                            ->label('Currency')
+                            ->options([
+                                'USD' => 'USD ($)',
+                                'EUR' => 'EUR (€)',
+                                'GBP' => 'GBP (£)',
+                                'CAD' => 'CAD (C$)',
+                                'AUD' => 'AUD (A$)',
+                                'BRL' => 'BRL (R$)',
+                                'INR' => 'INR (₹)',
+                                'JPY' => 'JPY (¥)',
+                                'CNY' => 'CNY (¥)',
+                                'KRW' => 'KRW (₩)',
+                                'RUB' => 'RUB (₽)',
+                                'TRY' => 'TRY (₺)',
+                                'MXN' => 'MXN (MX$)',
+                                'SEK' => 'SEK (kr)',
+                                'NOK' => 'NOK (kr)',
+                                'DKK' => 'DKK (kr)',
+                                'PLN' => 'PLN (zł)',
+                                'CHF' => 'CHF (CHF)',
+                                'ZAR' => 'ZAR (R)',
+                                'NGN' => 'NGN (₦)',
+                                'PHP' => 'PHP (₱)',
+                                'IDR' => 'IDR (Rp)',
+                                'MYR' => 'MYR (RM)',
+                                'THB' => 'THB (฿)',
+                                'AED' => 'AED (د.إ)',
+                                'SAR' => 'SAR (﷼)',
+                                'QAR' => 'QAR (﷼)',
+                                'PKR' => 'PKR (₨)',
+                                'BDT' => 'BDT (৳)',
+                                'EGP' => 'EGP (E£)',
+                                'VND' => 'VND (₫)',
+                                'TWD' => 'TWD (NT$)',
+                                'HKD' => 'HKD (HK$)',
+                                'SGD' => 'SGD (S$)',
+                                'NZD' => 'NZD (NZ$)',
+                                'CLP' => 'CLP (CL$)',
+                                'COP' => 'COP (COL$)',
+                                'ARS' => 'ARS (AR$)',
+                                'PEN' => 'PEN (S/)',
+                                'UAH' => 'UAH (₴)',
+                                'CZK' => 'CZK (Kč)',
+                                'HUF' => 'HUF (Ft)',
+                                'RON' => 'RON (lei)',
+                                'BGN' => 'BGN (лв)',
+                                'HRK' => 'HRK (kn)',
+                                'ISK' => 'ISK (kr)',
+                                'JPY' => 'JPY (¥)',
+                            ])
                             ->default('USD')
-                            ->maxLength(3),
+                            ->reactive()
+                            ->afterStateUpdated(fn ($state, \Filament\Forms\Set $set) => $set('default_currency_symbol', self::symbols()[$state] ?? '$')),
                         Forms\Components\TextInput::make('default_currency_symbol')
-                            ->label('Currency Symbol')
+                            ->label('Symbol')
                             ->default('$')
-                            ->maxLength(5),
+                            ->maxLength(5)
+                            ->disabled(),
                     ])->columns(2),
             ])
             ->statePath('data');
@@ -161,5 +212,21 @@ class GeneralSettings extends Page implements HasForms
         }
 
         file_put_contents($envFile, $content);
+    }
+
+    private static function symbols(): array
+    {
+        return [
+            'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'CAD' => 'C$', 'AUD' => 'A$',
+            'BRL' => 'R$', 'INR' => '₹', 'JPY' => '¥', 'CNY' => '¥', 'KRW' => '₩',
+            'RUB' => '₽', 'TRY' => '₺', 'MXN' => 'MX$', 'SEK' => 'kr', 'NOK' => 'kr',
+            'DKK' => 'kr', 'PLN' => 'zł', 'CHF' => 'CHF', 'ZAR' => 'R', 'NGN' => '₦',
+            'PHP' => '₱', 'IDR' => 'Rp', 'MYR' => 'RM', 'THB' => '฿', 'AED' => 'د.إ',
+            'SAR' => '﷼', 'QAR' => '﷼', 'PKR' => '₨', 'BDT' => '৳', 'EGP' => 'E£',
+            'VND' => '₫', 'TWD' => 'NT$', 'HKD' => 'HK$', 'SGD' => 'S$', 'NZD' => 'NZ$',
+            'CLP' => 'CL$', 'COP' => 'COL$', 'ARS' => 'AR$', 'PEN' => 'S/', 'UAH' => '₴',
+            'CZK' => 'Kč', 'HUF' => 'Ft', 'RON' => 'lei', 'BGN' => 'лв', 'HRK' => 'kn',
+            'ISK' => 'kr',
+        ];
     }
 }
