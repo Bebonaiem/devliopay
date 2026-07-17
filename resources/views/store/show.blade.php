@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="text-3xl font-black">
-                    $<span id="selected-price">{{ number_format($product->pricing->min('price') ?? $product->base_price ?? 0, 2) }}</span>
+                    <span id="selected-price">{{ $defaultCurrencySymbol }}{{ number_format($product->pricing->min('price') ?? $product->base_price ?? 0, 2) }}</span>
                     <span class="text-sm font-medium text-gray-500">/mo</span>
                 </div>
 
@@ -77,12 +77,12 @@
                         <div class="space-y-2">
                             @foreach($product->pricing as $plan)
                             <label class="group flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-brand-500/30 cursor-pointer transition-all has-[:checked]:border-brand-500/50 has-[:checked]:bg-brand-500/5">
-                                <input type="radio" name="pricing_id" value="{{ $plan->id }}" {{ $loop->first ? 'checked' : '' }} class="sr-only" onchange="document.getElementById('selected-price').textContent='{{ number_format($plan->price, 2) }}'">
+                                <input type="radio" name="pricing_id" value="{{ $plan->id }}" {{ $loop->first ? 'checked' : '' }} class="sr-only" onchange="document.getElementById('selected-price').textContent='{{ $defaultCurrencySymbol }}{{ number_format($plan->price, 2) }}'">
                                 <div class="w-4 h-4 rounded-full border-2 border-gray-600 group-has-[:checked]:border-brand-500 flex items-center justify-center transition-colors">
                                     <div class="w-2 h-2 rounded-full bg-brand-500 scale-0 group-has-[:checked]:scale-100 transition-transform"></div>
                                 </div>
                                 <span class="text-sm font-medium flex-1">{{ $plan->name ?? $plan->cycle }}</span>
-                                <span class="text-sm font-semibold">${{ number_format($plan->price, 2) }}<span class="text-gray-500 font-normal">{{ $plan->frequency }}</span></span>
+                                <span class="text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($plan->price, 2) }}<span class="text-gray-500 font-normal">{{ $plan->frequency }}</span></span>
                             </label>
                             @endforeach
                         </div>

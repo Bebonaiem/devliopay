@@ -15,7 +15,7 @@
         <div class="glass rounded-2xl p-8">
             <h2 class="text-lg font-bold mb-4">1. Uptime Guarantee</h2>
             <div class="text-sm text-gray-400 leading-relaxed space-y-3">
-                <p>{{ config('app.name', 'DevlioPay') }} guarantees a minimum uptime of <span class="text-brand-400 font-semibold">99.9%</span> for all paid services on a monthly basis. Uptime is calculated as total minutes in the month minus downtime minutes, divided by total minutes in the month.</p>
+                <p>{{ $companyName }} guarantees a minimum uptime of <span class="text-brand-400 font-semibold">99.9%</span> for all paid services on a monthly basis. Uptime is calculated as total minutes in the month minus downtime minutes, divided by total minutes in the month.</p>
                 <p>Scheduled maintenance windows are excluded from uptime calculations. We will provide at least 48 hours notice for planned maintenance.</p>
             </div>
         </div>

@@ -66,7 +66,7 @@
 <section class="py-24 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-4">Why DevlioPay?</h2>
+            <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-4">Why {{ $companyName }}?</h2>
             <p class="text-gray-400 max-w-xl mx-auto">Everything you need to power your projects, games, and businesses.</p>
         </div>
 
@@ -136,7 +136,7 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-brand-500/20 rounded-full blur-[100px]"></div>
             <div class="relative">
                 <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-4">Ready to Get Started?</h2>
-                <p class="text-gray-400 max-w-lg mx-auto mb-8">Join thousands of customers who trust DevlioPay for their hosting needs.</p>
+                <p class="text-gray-400 max-w-lg mx-auto mb-8">Join thousands of customers who trust {{ $companyName }} for their hosting needs.</p>
                 <a href="{{ route('store.index') }}" class="btn-primary px-10 py-4 rounded-2xl text-sm font-bold text-white shadow-xl shadow-brand-500/25 inline-flex items-center gap-2">
                     Browse Plans <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>

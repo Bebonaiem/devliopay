@@ -138,7 +138,7 @@ class PayPalGateway implements GatewayInterface
                 'application_context' => [
                     'return_url' => route('client.invoices.success', $invoice).'?payment=success&gateway=paypal',
                     'cancel_url' => route('client.invoices.paypal-cancel', $invoice),
-                    'brand_name' => config('app.name', 'DevlioPay'),
+                    'brand_name' => \App\Models\Setting::get('company_name', config('app.name', 'DevlioPay')),
                     'landing_page' => 'BILLING',
                 ],
             ]);
@@ -203,13 +203,13 @@ class PayPalGateway implements GatewayInterface
                             'currency_code' => strtoupper(config('app.currency', 'USD')),
                             'value' => number_format($amount, 2, '.', ''),
                         ],
-                        'description' => 'Account Credit Deposit - Add $'.number_format($amount, 2).' credit',
+                        'description' => 'Account Credit Deposit - Add '.\App\Models\Setting::get('default_currency_symbol', '$').number_format($amount, 2).' credit',
                     ],
                 ],
                 'application_context' => [
                     'return_url' => route('client.credits.deposit-success').'?gateway=paypal',
                     'cancel_url' => route('client.credits.paypal-cancel'),
-                    'brand_name' => config('app.name', 'DevlioPay'),
+                    'brand_name' => \App\Models\Setting::get('company_name', config('app.name', 'DevlioPay')),
                     'landing_page' => 'BILLING',
                 ],
             ]);

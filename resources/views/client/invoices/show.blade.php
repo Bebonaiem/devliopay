@@ -74,7 +74,7 @@
                                 <tr class="hover:bg-white/[0.02]">
                                     <td class="px-6 py-4 text-sm text-gray-300">{{ $item->description ?? $item->name ?? 'Item' }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-400 text-center">{{ $item->quantity ?? 1 }}</td>
-                                    <td class="px-6 py-4 text-sm font-semibold text-right">${{ number_format(($item->amount ?? 0) * ($item->quantity ?? 1), 2) }}</td>
+                                    <td class="px-6 py-4 text-sm font-semibold text-right">{{ $defaultCurrencySymbol }}{{ number_format(($item->amount ?? 0) * ($item->quantity ?? 1), 2) }}</td>
                                 </tr>
                                 @endforeach
                             @else
@@ -108,7 +108,7 @@
                                     :class="selectedMethod === 'balance' ? 'text-brand-400' : 'text-gray-400'"></i>
                                 <div>
                                     <p class="text-sm font-medium">Credit Balance</p>
-                                    <p class="text-xs text-gray-500">Available: ${{ number_format(auth()->user()->balance ?? 0, 2) }}</p>
+                                    <p class="text-xs text-gray-500">Available: {{ $defaultCurrencySymbol }}{{ number_format(auth()->user()->balance ?? 0, 2) }}</p>
                                 </div>
                             </label>
                             @endif
@@ -141,7 +141,7 @@
                     </div>
                     @if((auth()->user()->balance ?? 0) > 0 || (isset($availableGateways) && count($availableGateways) > 0))
                     <button @click="startPayment()" :disabled="processing" class="btn-primary w-full py-3 rounded-xl text-sm font-bold text-white shadow-lg shadow-brand-500/20 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4"></i> Pay ${{ number_format($invoice->total ?? 0, 2) }}</span>
+                        <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4"></i> Pay {{ $defaultCurrencySymbol }}{{ number_format($invoice->total ?? 0, 2) }}</span>
                         <span x-show="processing" class="inline-flex items-center gap-2"><svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...</span>
                     </button>
                     @endif
@@ -171,7 +171,7 @@
                         :disabled="processing"
                         class="btn-primary w-full py-3.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-brand-500/20 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Pay ${{ number_format($invoice->total ?? 0, 2) }}</span>
+                        <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Pay {{ $defaultCurrencySymbol }}{{ number_format($invoice->total ?? 0, 2) }}</span>
                         <span x-show="processing" class="inline-flex items-center gap-2"><svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...</span>
                     </button>
 
@@ -206,19 +206,19 @@
                     @if(($invoice->tax ?? 0) > 0)
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-400">Tax</span>
-                        <span class="text-sm font-medium">${{ number_format($invoice->tax, 2) }}</span>
+                        <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($invoice->tax, 2) }}</span>
                     </div>
                     @endif
                     @if(($invoice->credit ?? 0) > 0)
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-400">Credit</span>
-                        <span class="text-sm font-medium text-emerald-400">-${{ number_format($invoice->credit, 2) }}</span>
+                        <span class="text-sm font-medium text-emerald-400">-{{ $defaultCurrencySymbol }}{{ number_format($invoice->credit, 2) }}</span>
                     </div>
                     @endif
                     <hr class="border-white/5">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-semibold">Total</span>
-                        <span class="text-lg font-black">${{ number_format($invoice->total ?? 0, 2) }}</span>
+                        <span class="text-lg font-black">{{ $defaultCurrencySymbol }}{{ number_format($invoice->total ?? 0, 2) }}</span>
                     </div>
                 </div>
             </div>
@@ -229,24 +229,24 @@
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-400">Subtotal</span>
-                        <span class="text-sm font-medium">${{ number_format($invoice->subtotal ?? $invoice->total ?? 0, 2) }}</span>
+                        <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($invoice->subtotal ?? $invoice->total ?? 0, 2) }}</span>
                     </div>
                     @if(($invoice->tax ?? 0) > 0)
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-400">Tax</span>
-                        <span class="text-sm font-medium">${{ number_format($invoice->tax, 2) }}</span>
+                        <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($invoice->tax, 2) }}</span>
                     </div>
                     @endif
                     @if(($invoice->credit ?? 0) > 0)
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-400">Credit Applied</span>
-                        <span class="text-sm font-medium text-emerald-400">-${{ number_format($invoice->credit, 2) }}</span>
+                        <span class="text-sm font-medium text-emerald-400">-{{ $defaultCurrencySymbol }}{{ number_format($invoice->credit, 2) }}</span>
                     </div>
                     @endif
                     <hr class="border-white/5">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-semibold">Total Due</span>
-                        <span class="text-lg font-black">${{ number_format($invoice->total ?? 0, 2) }}</span>
+                        <span class="text-lg font-black">{{ $defaultCurrencySymbol }}{{ number_format($invoice->total ?? 0, 2) }}</span>
                     </div>
                 </div>
             </div>

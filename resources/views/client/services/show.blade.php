@@ -57,7 +57,7 @@
                     </div>
                     <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
                         <p class="text-[11px] text-gray-500 uppercase tracking-wider mb-1">Amount</p>
-                        <p class="text-sm font-medium">${{ number_format($service->pricing->currencies->first()?->pivot->amount ?? 0, 2) }}</p>
+                        <p class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($service->pricing->currencies->first()?->pivot->amount ?? 0, 2) }}</p>
                     </div>
                     @if($service->server_extension === 'pterodactyl' && ($service->server_properties['ip_address'] ?? null))
                     <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">

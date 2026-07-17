@@ -26,8 +26,9 @@ class TwoFactorService
         return $secret;
     }
 
-    public function getQrCodeUrl(string $secret, string $email, string $issuer = 'DevlioPay'): string
+    public function getQrCodeUrl(string $secret, string $email, ?string $issuer = null): string
     {
+        $issuer = $issuer ?? \App\Models\Setting::get('company_name', config('app.name', 'DevlioPay'));
         $otpauthUrl = "otpauth://totp/{$issuer}:{$email}?".http_build_query([
             'secret' => $secret,
             'issuer' => $issuer,

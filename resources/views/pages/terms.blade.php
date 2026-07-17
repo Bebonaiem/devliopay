@@ -15,7 +15,7 @@
         <div class="glass rounded-2xl p-8">
             <h2 class="text-lg font-bold mb-4">1. Acceptance of Terms</h2>
             <div class="text-sm text-gray-400 leading-relaxed space-y-3">
-                <p>By accessing and using {{ config('app.name', 'DevlioPay') }} ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Service.</p>
+                <p>By accessing and using {{ $companyName }} ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Service.</p>
                 <p>These terms apply to all users of the Service, including browsers, customers, merchants, and contributors of content.</p>
             </div>
         </div>
@@ -80,7 +80,7 @@
         <div class="glass rounded-2xl p-8">
             <h2 class="text-lg font-bold mb-4">7. Limitation of Liability</h2>
             <div class="text-sm text-gray-400 leading-relaxed space-y-3">
-                <p>To the maximum extent permitted by law, {{ config('app.name', 'DevlioPay') }} shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.</p>
+                <p>To the maximum extent permitted by law, {{ $companyName }} shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.</p>
                 <p>Our total liability for any claim arising from the Service shall not exceed the amount paid by you for the Service during the twelve (12) months preceding the claim.</p>
             </div>
         </div>
@@ -107,7 +107,7 @@
         <div class="glass rounded-2xl p-8">
             <h2 class="text-lg font-bold mb-4">10. Contact</h2>
             <div class="text-sm text-gray-400 leading-relaxed space-y-3">
-                <p>If you have any questions about these Terms of Service, please contact us through our support system or by email at support@{{ config('app.domain', 'devliopay.com') }}.</p>
+                <p>If you have any questions about these Terms of Service, please contact us through our support system or by email at {{ $companyEmail ?: 'support@' . $companyUrl }}.</p>
             </div>
         </div>
     </div>

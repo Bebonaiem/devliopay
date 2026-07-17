@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="description" content="{{ config('app.name', 'DevlioPay') }} - Premium Hosting & Game Server Solutions">
-    <title>@yield('title', config('app.name', 'DevlioPay'))</title>
+    <meta name="description" content="{{ $companyName }} - Premium Hosting & Game Server Solutions">
+    <title>@yield('title', $companyName)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -69,7 +69,11 @@
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25 group-hover:shadow-brand-500/40 transition-shadow">
                         <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                     </div>
-                    <span class="text-lg font-bold tracking-tight">Devlio<span class="text-brand-400">Pay</span></span>
+                    @if($companyLogo)
+                        <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="h-8 w-auto">
+                    @else
+                        <span class="text-lg font-bold tracking-tight">{{ $companyName }}</span>
+                    @endif
                 </a>
 
                 {{-- Desktop Nav --}}
@@ -201,9 +205,9 @@
                         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25">
                             <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                         </div>
-                        <span class="text-lg font-bold">Devlio<span class="text-brand-400">Pay</span></span>
+                        <span class="text-lg font-bold">{{ $companyName }}</span>
                     </a>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-6">Premium hosting and game server solutions powered by cutting-edge infrastructure.</p>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">{{ $companyFooterText ?: 'Premium hosting and game server solutions powered by cutting-edge infrastructure.' }}</p>
                     <div class="flex gap-3">
                         <a href="#" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-brand-500/20 flex items-center justify-center text-gray-400 hover:text-brand-400 transition-all"><i class="fab fa-discord"></i></a>
                         <a href="#" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-brand-500/20 flex items-center justify-center text-gray-400 hover:text-brand-400 transition-all"><i class="fab fa-twitter"></i></a>
@@ -244,7 +248,7 @@
 
             {{-- Bottom --}}
             <div class="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-gray-500 text-xs">&copy; {{ date('Y') }} {{ config('app.name', 'DevlioPay') }}. All rights reserved.</p>
+                <p class="text-gray-500 text-xs">&copy; {{ date('Y') }} {{ $companyName }}. All rights reserved.</p>
                 <div class="flex items-center gap-6">
                     <a href="{{ route('terms') }}" class="text-gray-500 hover:text-gray-300 text-xs transition-colors">Terms of Service</a>
                     <a href="{{ route('privacy') }}" class="text-gray-500 hover:text-gray-300 text-xs transition-colors">Privacy Policy</a>

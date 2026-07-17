@@ -38,7 +38,7 @@
                 <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-amber-400"></i></div>
                 <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Spent</span>
             </div>
-            <div class="text-2xl font-black">${{ number_format((float) ($totalSpent ?? 0), 2) }}</div>
+            <div class="text-2xl font-black">{{ $defaultCurrencySymbol }}{{ number_format((float) ($totalSpent ?? 0), 2) }}</div>
             <p class="text-xs text-gray-500 mt-1">Total spent</p>
         </div>
         <div class="stat-card rounded-2xl p-5">
@@ -105,7 +105,7 @@
                                 <div class="flex-1 flex flex-col items-center gap-1">
                                     <div class="w-full rounded-t bg-brand-500/60 hover:bg-brand-400/80 transition-colors"
                                          style="height: {{ ($amount / $maxVal) * 100 }}%"
-                                         title="{{ $month }}: ${{ number_format($amount, 2) }}">
+                                          title="{{ $month }}: {{ $defaultCurrencySymbol }}{{ number_format($amount, 2) }}">
                                     </div>
                                 </div>
                             @endforeach
@@ -174,7 +174,7 @@
                             <p class="text-[11px] text-gray-500">{{ $invoice->created_at->format('M j, Y') }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs font-semibold">${{ number_format($invoice->total, 2) }}</p>
+                            <p class="text-xs font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($invoice->total, 2) }}</p>
                             <span class="text-[10px] font-semibold
                                 {{ $invoice->status === 'paid' ? 'text-emerald-400' : '' }}
                                 {{ $invoice->status === 'pending' ? 'text-amber-400' : '' }}

@@ -32,7 +32,7 @@
         <div class="absolute inset-0 hero-gradient opacity-30"></div>
         <div class="relative">
             <p class="text-sm text-gray-400 mb-2">Available Balance</p>
-            <div class="text-5xl font-black mb-1">${{ number_format($balance ?? 0, 2) }}</div>
+            <div class="text-5xl font-black mb-1">{{ $defaultCurrencySymbol }}{{ number_format($balance ?? 0, 2) }}</div>
             <p class="text-xs text-gray-500">Credits are applied automatically to invoices</p>
         </div>
     </div>
@@ -44,12 +44,12 @@
             <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Amount</label>
             <div class="flex gap-2">
                 @foreach([5, 10, 25, 50] as $amt)
-                <button type="button" @click="amount = {{ $amt }}" class="flex-1 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-400 bg-white/[0.03] border border-white/10 hover:border-brand-500/30 hover:text-brand-400 transition-all" :class="amount === {{ $amt }} ? 'border-brand-500/50 text-brand-400 bg-brand-500/5' : ''">${{ $amt }}</button>
+                <button type="button" @click="amount = {{ $amt }}" class="flex-1 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-400 bg-white/[0.03] border border-white/10 hover:border-brand-500/30 hover:text-brand-400 transition-all" :class="amount === {{ $amt }} ? 'border-brand-500/50 text-brand-400 bg-brand-500/5' : ''">{{ $defaultCurrencySymbol }}{{ $amt }}</button>
                 @endforeach
             </div>
         </div>
         <div class="relative">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{{ $defaultCurrencySymbol }}</span>
             <input x-model.number="amount" type="number" min="5" step="0.01" class="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-8 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20" placeholder="0.00">
         </div>
 
@@ -74,7 +74,7 @@
         </div>
 
         <button @click="startDeposit()" :disabled="processing || amount < 5 || !paymentMethod" class="btn-primary w-full py-3 rounded-xl text-sm font-semibold text-white shadow-lg shadow-brand-500/20 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-            <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4"></i> Add $<span x-text="amount ? amount.toFixed(2) : '0.00'"></span></span>
+            <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4"></i> Add {{ $defaultCurrencySymbol }}<span x-text="amount ? amount.toFixed(2) : '0.00'"></span></span>
             <span x-show="processing" class="inline-flex items-center gap-2"><svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...</span>
         </button>
     </div>
@@ -88,7 +88,7 @@
     {{-- Custom Payment Element --}}
     <div x-show="stripeReady" class="glass rounded-2xl p-6 space-y-5">
         <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold">Add Funds - $<span x-text="amount ? amount.toFixed(2) : '0.00'"></span></h2>
+            <h2 class="text-sm font-semibold">Add Funds - {{ $defaultCurrencySymbol }}<span x-text="amount ? amount.toFixed(2) : '0.00'"></span></h2>
             <button @click="resetStripe()" class="text-xs text-gray-500 hover:text-gray-300 transition-colors"><i data-lucide="arrow-left" class="w-3 h-3 inline mr-1"></i> Back</button>
         </div>
 
@@ -97,7 +97,7 @@
         </div>
 
         <button @click="confirmPayment()" :disabled="processing" class="btn-primary w-full py-3.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-brand-500/20 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-            <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Add $<span x-text="amount ? amount.toFixed(2) : '0.00'"></span></span>
+            <span x-show="!processing" class="inline-flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Add {{ $defaultCurrencySymbol }}<span x-text="amount ? amount.toFixed(2) : '0.00'"></span></span>
             <span x-show="processing" class="inline-flex items-center gap-2"><svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...</span>
         </button>
 
@@ -126,7 +126,7 @@
                         </div>
                     </div>
                     <span class="text-sm font-semibold {{ ($tx->amount ?? 0) > 0 ? 'text-emerald-400' : 'text-red-400' }}">
-                        {{ ($tx->amount ?? 0) > 0 ? '+' : '' }}${{ number_format(abs($tx->amount ?? 0), 2) }}
+                        {{ ($tx->amount ?? 0) > 0 ? '+' : '' }}{{ $defaultCurrencySymbol }}{{ number_format(abs($tx->amount ?? 0), 2) }}
                     </span>
                 </div>
                 @endforeach
@@ -163,7 +163,7 @@ function creditDeposit() {
 
         async startDeposit() {
             this.error = null;
-            if (this.amount < 5) { this.error = 'Minimum deposit amount is $5.00'; return; }
+            if (this.amount < 5) { this.error = 'Minimum deposit amount is {{ $defaultCurrencySymbol }}5.00'; return; }
             this.processing = true;
 
             if (!this.paymentMethod) { this.error = 'Please select a payment method.'; this.processing = false; return; }

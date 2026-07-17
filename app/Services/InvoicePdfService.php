@@ -18,8 +18,8 @@ class InvoicePdfService
         $credit = $invoice->credit ?? 0;
         $amountDue = max(0, $total - $credit);
 
-        $companyName = config('app.name', 'DevlioPay');
-        $companyEmail = config('mail.from.address', 'billing@devliopay.com');
+        $companyName = \App\Models\Setting::get('company_name', config('app.name', 'DevlioPay'));
+        $companyEmail = \App\Models\Setting::get('company_email', config('mail.from.address', 'noreply@example.com'));
 
         $pdf = Pdf::loadView('pdf.invoice', compact(
             'invoice', 'subtotal', 'tax', 'total', 'credit', 'amountDue',

@@ -39,7 +39,7 @@
                             </form>
                         </div>
                         @endif
-                        <span class="text-sm font-semibold">${{ number_format($item['line_total'] ?? $item['price'] ?? 0, 2) }}<span class="text-gray-500 font-normal">{{ $item['pricing']->frequency ?? '/mo' }}</span></span>
+                        <span class="text-sm font-semibold">{{ $defaultCurrencySymbol }}{{ number_format($item['line_total'] ?? $item['price'] ?? 0, 2) }}<span class="text-gray-500 font-normal">{{ $item['pricing']->frequency ?? '/mo' }}</span></span>
                         <form id="remove-cart-{{ $key }}" method="POST" action="{{ route('cart.remove', $key) }}">
                             @csrf
                             @method('DELETE')
@@ -57,24 +57,24 @@
         <div class="glass rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-400">Subtotal</span>
-                <span class="text-sm font-medium">${{ number_format($subtotal ?? 0, 2) }}</span>
+                <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($subtotal ?? 0, 2) }}</span>
             </div>
             @if(($tax ?? 0) > 0)
             <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-400">Tax</span>
-                <span class="text-sm font-medium">${{ number_format($tax, 2) }}</span>
+                <span class="text-sm font-medium">{{ $defaultCurrencySymbol }}{{ number_format($tax, 2) }}</span>
             </div>
             @endif
             @if(($promoDiscount ?? 0) > 0)
             <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-400">Promo Discount</span>
-                <span class="text-sm font-medium text-emerald-400">-${{ number_format($promoDiscount, 2) }}</span>
+                <span class="text-sm font-medium text-emerald-400">-{{ $defaultCurrencySymbol }}{{ number_format($promoDiscount, 2) }}</span>
             </div>
             @endif
             <hr class="border-white/5">
             <div class="flex items-center justify-between">
                 <span class="text-base font-semibold">Total</span>
-                <span class="text-xl font-black">${{ number_format($total ?? 0, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></span>
+                <span class="text-xl font-black">{{ $defaultCurrencySymbol }}{{ number_format($total ?? 0, 2) }}<span class="text-sm font-medium text-gray-500">/mo</span></span>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-2">

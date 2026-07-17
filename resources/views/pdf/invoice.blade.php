@@ -36,9 +36,9 @@
 <body>
     <div class="invoice-header">
         <div>
-            <div class="logo">{{ $companyName ?? 'DevlioPay' }}</div>
+            <div class="logo">{{ $companyName }}</div>
             <div class="company-info">
-                {{ $companyEmail ?? 'billing@devliopay.com' }}<br>
+                {{ $companyEmail }}<br>
                 {{ config('app.url', 'http://localhost') }}
             </div>
         </div>
@@ -117,8 +117,8 @@
                 <tr>
                     <td>{{ $item->description }}</td>
                     <td class="text-right">{{ $item->quantity }}</td>
-                    <td class="text-right">${{ number_format($item->amount, 2) }}</td>
-                    <td class="text-right">${{ number_format($item->amount * $item->quantity, 2) }}</td>
+                    <td class="text-right">{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($item->amount, 2) }}</td>
+                    <td class="text-right">{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($item->amount * $item->quantity, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -128,27 +128,27 @@
         <table>
             <tr>
                 <td>Subtotal:</td>
-                <td class="text-right">${{ number_format($subtotal ?? $invoice->subtotal, 2) }}</td>
+                <td class="text-right">{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($subtotal ?? $invoice->subtotal, 2) }}</td>
             </tr>
             @if(($tax ?? $invoice->tax ?? 0) > 0)
             <tr>
                 <td>Tax:</td>
-                <td class="text-right">${{ number_format($tax ?? $invoice->tax, 2) }}</td>
+                <td class="text-right">{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($tax ?? $invoice->tax, 2) }}</td>
             </tr>
             @endif
             <tr>
                 <td>Total:</td>
-                <td class="text-right">${{ number_format($total ?? $invoice->total, 2) }}</td>
+                <td class="text-right">{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($total ?? $invoice->total, 2) }}</td>
             </tr>
             @if(($credit ?? $invoice->credit ?? 0) > 0)
             <tr>
                 <td>Credit Applied:</td>
-                <td class="text-right" style="color: #059669;">-${{ number_format($credit ?? $invoice->credit, 2) }}</td>
+                <td class="text-right" style="color: #059669;">-{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($credit ?? $invoice->credit, 2) }}</td>
             </tr>
             @endif
             <tr class="total-row amount-due">
                 <td><strong>Amount Due:</strong></td>
-                <td class="text-right"><strong>${{ number_format($amountDue ?? max(0, $invoice->total - ($invoice->credit ?? 0)), 2) }}</strong></td>
+                <td class="text-right"><strong>{{ $invoice->currency->symbol ?? $defaultCurrencySymbol }}{{ number_format($amountDue ?? max(0, $invoice->total - ($invoice->credit ?? 0)), 2) }}</strong></td>
             </tr>
         </table>
     </div>
@@ -162,7 +162,7 @@
 
     <div class="footer">
         <p>Thank you for your business!</p>
-        <p>{{ $companyName ?? 'DevlioPay' }} - Open Source Billing Platform</p>
+        <p>{{ $companyName }} - Open Source Billing Platform</p>
     </div>
 </body>
 </html>

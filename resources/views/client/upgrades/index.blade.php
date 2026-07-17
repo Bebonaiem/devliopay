@@ -22,7 +22,7 @@
                         <p class="text-xs text-gray-500">{{ $upgrade->current_plan ?? '' }} &rarr; {{ $upgrade->new_plan ?? '' }}</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-semibold text-emerald-400">+${{ number_format($upgrade->price_diff ?? 0, 2) }}/mo</span>
+                        <span class="text-sm font-semibold text-emerald-400">+{{ $defaultCurrencySymbol }}{{ number_format($upgrade->price_diff ?? 0, 2) }}/mo</span>
                         <a href="{{ route('client.upgrades.pay', $upgrade->id) }}" class="btn-primary px-4 py-2 rounded-xl text-xs font-semibold text-white">Upgrade</a>
                     </div>
                 </div>

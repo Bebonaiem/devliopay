@@ -16,7 +16,7 @@
                 </div>
             </a>
             <h1 class="text-2xl font-bold tracking-tight">Create your account</h1>
-            <p class="text-sm text-gray-400 mt-1">Join DevlioPay today</p>
+            <p class="text-sm text-gray-400 mt-1">Join {{ $companyName }} today</p>
         </div>
 
         <form method="POST" action="{{ route('register') }}" class="glass rounded-2xl p-6 space-y-5">

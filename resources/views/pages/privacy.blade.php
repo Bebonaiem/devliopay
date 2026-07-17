@@ -125,7 +125,7 @@
         <div class="glass rounded-2xl p-8">
             <h2 class="text-lg font-bold mb-4">10. Contact Us</h2>
             <div class="text-sm text-gray-400 leading-relaxed space-y-3">
-                <p>If you have any questions about this Privacy Policy, please contact us through our support system or by email at privacy@{{ config('app.domain', 'devliopay.com') }}.</p>
+                <p>If you have any questions about this Privacy Policy, please contact us through our support system or by email at {{ $companyEmail ?: 'privacy@' . $companyUrl }}.</p>
             </div>
         </div>
     </div>

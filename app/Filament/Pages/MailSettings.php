@@ -38,7 +38,7 @@ class MailSettings extends Page implements HasForms
             'mail_password' => env('MAIL_PASSWORD', ''),
             'mail_encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'mail_from_address' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-            'mail_from_name' => env('MAIL_FROM_NAME', 'DevlioPay'),
+            'mail_from_name' => env('MAIL_FROM_NAME', Setting::get('company_name', config('app.name', 'DevlioPay'))),
             'test_email_to' => '',
         ]);
     }
@@ -87,7 +87,7 @@ class MailSettings extends Page implements HasForms
                             ->default('noreply@example.com'),
                         Forms\Components\TextInput::make('mail_from_name')
                             ->label('From Name')
-                            ->default('DevlioPay'),
+                            ->default(Setting::get('company_name', config('app.name', 'DevlioPay'))),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Test Email')
@@ -121,17 +121,17 @@ class MailSettings extends Page implements HasForms
                                     $testHtml = view('emails.layout', [
                                         'company_name' => $companyName,
                                         'company_address' => Setting::get('company_address', ''),
-                                        'subject' => 'DevlioPay Test Email',
+                                        'subject' => $companyName . ' Test Email',
                                         'title' => 'Test Email',
                                         'actionUrl' => '',
                                         'actionText' => '',
                                         'slot' => '<p style="margin:0 0 20px;font-size:16px;color:#e2e8f0;">Hello!</p><p style="margin:0 0 20px;font-size:15px;color:#94a3b8;">This is a test email from your '.$companyName.' mail system.</p><table width="100%" cellpadding="0" cellspacing="0" style="background:#0f172a;border-radius:12px;border:1px solid #334155;"><tr><td style="padding:24px;text-align:center;"><span style="color:#22c55e;font-size:18px;font-weight:700;">✅ Mail Configuration Working</span></td></tr></table><p style="margin:20px 0 0;font-size:14px;color:#94a3b8;">If you received this email, your mail settings are configured correctly.</p>',
                                     ])->render();
 
-                                    Mail::send([], [], function ($message) use ($testHtml, $to, $fromAddress, $fromName) {
+                                    Mail::send([], [], function ($message) use ($testHtml, $to, $fromAddress, $fromName, $companyName) {
                                         $message->to($to)
                                             ->from($fromAddress, $fromName)
-                                            ->subject('DevlioPay Test Email')
+                                            ->subject($companyName . ' Test Email')
                                             ->html($testHtml);
                                     });
 
