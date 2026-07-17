@@ -55,13 +55,13 @@ class GitHubUpdate extends Page
 
         $steps = [
             ['label' => 'Pulling from GitHub...', 'cmd' => "git -C {$base} pull origin {$this->currentBranch} 2>&1"],
-            ['label' => 'Installing PHP dependencies...', 'cmd' => "cd {$base} && sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction 2>&1"],
-            ['label' => 'Installing Node dependencies...', 'cmd' => "cd {$base} && sudo -u devliopay npm install 2>&1"],
-            ['label' => 'Building frontend assets...', 'cmd' => "cd {$base} && sudo -u devliopay npm run build 2>&1"],
-            ['label' => 'Running migrations...', 'cmd' => "cd {$base} && sudo -u devliopay php artisan migrate --force --no-interaction 2>&1"],
-            ['label' => 'Caching config...', 'cmd' => "cd {$base} && sudo -u devliopay php artisan config:cache 2>&1"],
-            ['label' => 'Caching routes...', 'cmd' => "cd {$base} && sudo -u devliopay php artisan route:cache 2>&1"],
-            ['label' => 'Caching views...', 'cmd' => "cd {$base} && sudo -u devliopay php artisan view:cache 2>&1"],
+            ['label' => 'Installing PHP dependencies...', 'cmd' => "cd {$base} && composer install --no-dev --optimize-autoloader --no-interaction 2>&1"],
+            ['label' => 'Installing Node dependencies...', 'cmd' => "cd {$base} && npm install 2>&1"],
+            ['label' => 'Building frontend assets...', 'cmd' => "cd {$base} && npm run build 2>&1"],
+            ['label' => 'Running migrations...', 'cmd' => "cd {$base} && php artisan migrate --force --no-interaction 2>&1"],
+            ['label' => 'Clearing config cache...', 'cmd' => "cd {$base} && php artisan config:clear 2>&1"],
+            ['label' => 'Caching routes...', 'cmd' => "cd {$base} && php artisan route:cache 2>&1"],
+            ['label' => 'Caching views...', 'cmd' => "cd {$base} && php artisan view:cache 2>&1"],
             ['label' => 'Fixing permissions...', 'cmd' => "chown -R devliopay:devliopay {$base} 2>&1"],
         ];
 
