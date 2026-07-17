@@ -32,7 +32,7 @@ class ServiceController extends Controller
     {
         $this->authorize('view', $service);
 
-        $service->load(['product', 'pricing', 'order']);
+        $service->load(['product', 'pricing', 'order', 'addons']);
 
         if ($service->server_extension === 'pterodactyl' && ($service->server_properties['ip_address'] ?? null) === null && ($service->server_properties['server_id'] ?? null)) {
             try {
@@ -60,8 +60,7 @@ class ServiceController extends Controller
         }
 
         $availableAddons = Addon::where('is_active', true)
-            ->where('category_id', $service->product->category_id ?? null)
-            ->whereNotIn('id', $service->addons->pluck('addon_id'))
+            ->whereNotIn('id', $service->addons->pluck('id'))
             ->orderBy('sort_order')
             ->get();
 
