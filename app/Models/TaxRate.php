@@ -73,6 +73,8 @@ class TaxRate extends Model
             }
         }
 
-        return $query->whereNull('country_code')->first();
+        return $query->where(function ($q) {
+            $q->whereNull('country_code')->orWhere('country_code', '');
+        })->first();
     }
 }
