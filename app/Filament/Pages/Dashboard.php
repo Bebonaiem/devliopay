@@ -23,8 +23,6 @@ class Dashboard extends BaseDashboard
 
     public function mount(): void
     {
-        parent::mount();
-
         $this->loadStats();
         $this->loadRecentOrders();
         $this->loadRecentTickets();
