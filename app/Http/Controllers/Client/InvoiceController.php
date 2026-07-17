@@ -26,7 +26,7 @@ class InvoiceController extends Controller
     {
         $user = Auth::user();
         $query = $user->invoices()
-            ->with('items');
+            ->with(['items', 'currency']);
 
         if ($request->filled('status') && in_array($request->status, ['paid', 'pending', 'overdue'])) {
             $query->where('status', $request->status);

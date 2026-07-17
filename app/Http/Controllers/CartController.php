@@ -158,10 +158,9 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
-        $currency = Currency::where('is_default', true)->first();
-
         $total = 0;
         $orderItems = [];
+        $pricingCurrency = null;
 
         foreach ($cart as $key => $item) {
             $pricing = ProductPricing::with('currencies', 'product')->find($item['pricing_id']);
@@ -169,9 +168,14 @@ class CartController extends Controller
                 continue;
             }
 
-            $price = $pricing->currencies->first()?->pivot->amount ?? 0;
+            $pivotCurrency = $pricing->currencies->first();
+            $price = $pivotCurrency?->pivot->amount ?? 0;
             $product = $pricing->product;
-            $setupFee = $pricing->currencies->first()?->pivot->setup_fee ?? 0;
+            $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;
+
+            if (! $pricingCurrency && $pivotCurrency) {
+                $pricingCurrency = $pivotCurrency;
+            }
 
             $orderItems[] = [
                 'product_id' => $item['product_id'],
@@ -211,14 +215,14 @@ class CartController extends Controller
         $invoice = null;
         $serviceIds = [];
 
-        DB::transaction(function () use ($user, $totalWithTax, $subtotal, $taxAmount, $taxRate, $currency, $orderItems, $promoCode, &$order, &$invoice, &$serviceIds) {
+        DB::transaction(function () use ($user, $totalWithTax, $subtotal, $taxAmount, $taxRate, $pricingCurrency, $orderItems, $promoCode, &$order, &$invoice, &$serviceIds) {
             $order = Order::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
                 'subtotal' => $subtotal,
                 'tax' => $taxAmount,
                 'total' => $totalWithTax,
-                'currency_id' => $currency?->id,
+                'currency_id' => $pricingCurrency?->id,
             ]);
 
             foreach ($orderItems as $itemData) {
