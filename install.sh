@@ -203,9 +203,10 @@ print_ok "Frontend assets built"
 
 print_step 9 $TOTAL_STEPS "Environment Configuration"
 sudo -u devliopay cp .env.example .env
-sudo -u devliopay php artisan key:generate --force --no-interaction
 touch database/database.sqlite
+chown devliopay:devliopay database/database.sqlite
 chmod 664 database/database.sqlite
+sudo -u devliopay php artisan key:generate --force --no-interaction
 
 if [ "$IS_IP" = true ]; then
     APP_URL="http://${DOMAIN}"
