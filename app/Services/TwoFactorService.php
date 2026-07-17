@@ -29,7 +29,7 @@ class TwoFactorService
     public function getQrCodeUrl(string $secret, string $email, ?string $issuer = null): string
     {
         $issuer = $issuer ?? \App\Models\Setting::get('company_name', config('app.name', 'DevlioPay'));
-        $otpauthUrl = "otpauth://totp/{$issuer}:{$email}?".http_build_query([
+        $otpauthUrl = "otpauth://totp/".rawurlencode($issuer).":".rawurlencode($email)."?".http_build_query([
             'secret' => $secret,
             'issuer' => $issuer,
             'algorithm' => 'SHA1',
@@ -61,7 +61,7 @@ class TwoFactorService
 
     public function verifyCode(string $secret, string $code): bool
     {
-        $timestamp = floor(time() / self::TOTP_PERIOD);
+        $timestamp = intdiv(time(), self::TOTP_PERIOD);
 
         for ($i = -1; $i <= 1; $i++) {
             $calculatedCode = $this->generateCode($secret, $timestamp + $i);
@@ -84,7 +84,7 @@ class TwoFactorService
             ((ord($hmac[$offset + 1]) & 0xFF) << 16) |
             ((ord($hmac[$offset + 2]) & 0xFF) << 8) |
             (ord($hmac[$offset + 3]) & 0xFF)
-        ) % pow(10, self::TOTP_DIGITS);
+        ) % (10 ** self::TOTP_DIGITS);
 
         return str_pad((string) $code, self::TOTP_DIGITS, '0', STR_PAD_LEFT);
     }
