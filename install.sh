@@ -55,23 +55,6 @@ if [ ! -t 0 ]; then
     exit 1
 fi
 
-print_step() {
-    echo ""
-    echo -e "${YELLOW}${BOLD}[$1/$2] $3${NC}"
-}
-
-print_ok() {
-    echo -e "  ${GREEN}✓${NC} $1"
-}
-
-print_error() {
-    echo -e "  ${RED}✗${NC} $1"
-}
-
-print_info() {
-    echo -e "  ${CYAN}→${NC} $1"
-}
-
 # ─── Interactive Setup Menu ────────────────────────────────────────────────────
 setup_config() {
     echo ""
@@ -123,8 +106,6 @@ setup_config() {
         ADMIN_PASSWORD=$(openssl rand -base64 12)
         echo -e "  ${CYAN}→ Generated: ${ADMIN_PASSWORD}${NC}"
     fi
-
-    DB_PASSWORD=$(openssl rand -base64 32)
 
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
@@ -182,10 +163,12 @@ fi
 print_ok "User 'devliopay' ready"
 
 print_info "Configuring PHP-FPM to run as devliopay..."
-sed -i 's/^user = www-data/user = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
-sed -i 's/^group = www-data/group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
-sed -i 's/^listen\.owner = www-data/listen.owner = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
-sed -i 's/^listen\.group = www-data/listen.group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^user = .*/user = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^group = .*/group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^;*listen\.owner = .*/listen.owner = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^;*listen\.group = .*/listen.group = devliopay/' /etc/php/8.3/fpm/pool.d/www.conf
+sed -i 's/^listen = .*/listen = \/run\/php\/php8.3-fpm.sock/' /etc/php/8.3/fpm/pool.d/www.conf
+systemctl restart php8.3-fpm
 print_ok "PHP-FPM configured for devliopay user"
 
 print_step 6 $TOTAL_STEPS "Cloning Repository"
@@ -194,7 +177,6 @@ if [ -d "$INSTALL_DIR" ]; then
 fi
 git clone https://github.com/Bebonaiem/devliopay.git "$INSTALL_DIR"
 cd "$INSTALL_DIR"
-chown -R devliopay:devliopay "$INSTALL_DIR"
 git config --global --add safe.directory "$INSTALL_DIR"
 print_ok "Repository cloned to ${INSTALL_DIR}"
 
@@ -208,11 +190,10 @@ sudo -u devliopay npm run build
 print_ok "Frontend assets built"
 
 print_step 9 $TOTAL_STEPS "Environment Configuration"
-cp .env.example .env
-php artisan key:generate --force --no-interaction
+sudo -u devliopay cp .env.example .env
+sudo -u devliopay php artisan key:generate --force --no-interaction
 touch database/database.sqlite
 chmod 664 database/database.sqlite
-chown devliopay:devliopay database/database.sqlite
 
 if [ "$IS_IP" = true ]; then
     APP_URL="http://${DOMAIN}"
@@ -223,16 +204,15 @@ fi
 sed -i "s|APP_URL=http://localhost|APP_URL=${APP_URL}|g" .env
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
-sed -i "s|MAIL_MAILER=log|MAIL_MAILER=smtp|g" .env
 print_ok "Environment configured"
 
 print_step 10 $TOTAL_STEPS "Database Migration & Seeding"
-php artisan migrate --force --no-interaction
-php artisan db:seed --force --no-interaction
+sudo -u devliopay php artisan migrate --force --no-interaction
+sudo -u devliopay php artisan db:seed --force --no-interaction
 print_ok "Database migrated and seeded"
 
 print_step 11 $TOTAL_STEPS "Creating Admin User"
-php artisan tinker --execute="
+sudo -u devliopay php artisan tinker --execute="
 \$user = App\Models\User::create([
     'name' => '${ADMIN_NAME}',
     'email' => '${ADMIN_EMAIL}',
@@ -250,25 +230,24 @@ chmod -R 755 "$INSTALL_DIR"
 chmod -R 775 "$INSTALL_DIR/storage" 2>/dev/null || true
 chmod -R 775 "$INSTALL_DIR/bootstrap/cache" 2>/dev/null || true
 
-php artisan storage:link --force --no-interaction
-php artisan config:cache --no-interaction
-php artisan route:cache --no-interaction
-php artisan view:cache --no-interaction
-php artisan icon:cache --no-interaction 2>/dev/null || true
-print_ok "Permissions set and cache cleared"
+# Create required directories
+sudo -u devliopay mkdir -p storage/logs storage/framework/views storage/framework/sessions storage/framework/cache
+
+# Clear and build cache AS devliopay user
+sudo -u devliopay php artisan storage:link --force --no-interaction
+sudo -u devliopay php artisan config:cache --no-interaction
+sudo -u devliopay php artisan route:cache --no-interaction
+sudo -u devliopay php artisan view:cache --no-interaction
+sudo -u devliopay php artisan icon:cache --no-interaction 2>/dev/null || true
+
+# Final ownership pass after cache files are created
+chown -R devliopay:devliopay "$INSTALL_DIR"
+print_ok "Permissions set and cache built"
 
 # ─── Nginx Configuration ──────────────────────────────────────────────────────
 print_info "Configuring Nginx..."
 
-PHP_FPM_SOCK=$(find /var/run/php -name "php*-fpm.sock" 2>/dev/null | head -1)
-if [ -z "$PHP_FPM_SOCK" ]; then
-    apt-get install -y php8.3-fpm 2>/dev/null || true
-    systemctl start php8.3-fpm 2>/dev/null || true
-    PHP_FPM_SOCK=$(find /var/run/php -name "php*-fpm.sock" 2>/dev/null | head -1)
-fi
-if [ -z "$PHP_FPM_SOCK" ]; then
-    PHP_FPM_SOCK="/var/run/php/php8.3-fpm.sock"
-fi
+PHP_FPM_SOCK="/var/run/php/php8.3-fpm.sock"
 
 if [ "$IS_IP" = true ]; then
     NGINX_SERVER_NAME="_"
@@ -317,8 +296,7 @@ NGINX
 ln -sf /etc/nginx/sites-available/devliopay /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 
-PHP_FPM_VERSION=$(echo "$PHP_FPM_SOCK" | sed -E 's|.*php([0-9.]+)-fpm.*|\1|')
-systemctl restart "php${PHP_FPM_VERSION}-fpm" 2>/dev/null || systemctl restart php8.3-fpm 2>/dev/null || true
+systemctl restart php8.3-fpm
 systemctl restart nginx
 print_ok "Nginx configured and running"
 
