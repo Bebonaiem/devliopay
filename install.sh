@@ -44,12 +44,14 @@ print_info() {
 }
 
 # ─── Self-download if piped ───────────────────────────────────────────────────
-if [ ! -t 0 ] && [ -z "$DEVLIOPAY_RUNNING" ]; then
+if [ ! -t 0 ] && [ ! -f /tmp/.devliopay-installing ]; then
+    touch /tmp/.devliopay-installing
     echo -e "${CYAN}Downloading installer...${NC}"
     curl -sL "https://raw.githubusercontent.com/Bebonaiem/devliopay/master/install.sh" -o /tmp/install-devliopay.sh
     chmod +x /tmp/install-devliopay.sh
-    exec env DEVLIOPAY_RUNNING=1 bash /tmp/install-devliopay.sh
+    exec bash /tmp/install-devliopay.sh
 fi
+rm -f /tmp/.devliopay-installing
 
 print_step() {
     echo ""
