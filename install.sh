@@ -139,7 +139,7 @@ print_banner
 setup_config
 
 # ─── Installation ──────────────────────────────────────────────────────────────
-TOTAL_STEPS=12
+TOTAL_STEPS=13
 
 print_step 1 $TOTAL_STEPS "System Update & Dependencies"
 
@@ -152,25 +152,35 @@ fi
 
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3
+apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3 ufw
 print_ok "System packages installed"
 
-print_step 2 $TOTAL_STEPS "Installing PHP 8.3+ & Extensions"
+print_step 2 $TOTAL_STEPS "Configuring Firewall"
+ufw --force reset >/dev/null 2>&1 || true
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22/tcp comment 'SSH'
+ufw allow 80/tcp comment 'HTTP'
+ufw allow 443/tcp comment 'HTTPS'
+ufw --force enable
+print_ok "Firewall configured (SSH, HTTP, HTTPS open)"
+
+print_step 3 $TOTAL_STEPS "Installing PHP 8.3+ & Extensions"
 add-apt-repository -y ppa:ondrej/php
 apt-get update -y
 apt-get install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-gd php8.3-sqlite3 php8.3-intl php8.3-tokenizer php8.3-dom php8.3-fileinfo php8.3-redis php8.3-fpm
 print_ok "PHP 8.3 installed"
 
-print_step 3 $TOTAL_STEPS "Installing Node.js 22.x & npm"
+print_step 4 $TOTAL_STEPS "Installing Node.js 22.x & npm"
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt-get install -y nodejs
 print_ok "Node.js $(node -v) installed"
 
-print_step 4 $TOTAL_STEPS "Installing Composer"
+print_step 5 $TOTAL_STEPS "Installing Composer"
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 print_ok "Composer $(composer -V | head -1) installed"
 
-print_step 5 $TOTAL_STEPS "Setting up Web Server User"
+print_step 6 $TOTAL_STEPS "Setting up Web Server User"
 if ! id -g devliopay >/dev/null 2>&1; then
     addgroup --system devliopay
 fi
@@ -198,7 +208,7 @@ OVERRIDE
 systemctl daemon-reload
 print_ok "PHP-FPM configured for devliopay user"
 
-print_step 6 $TOTAL_STEPS "Cloning Repository"
+print_step 7 $TOTAL_STEPS "Cloning Repository"
 if [ -d "$INSTALL_DIR" ]; then
     cd /
     rm -rf "$INSTALL_DIR"
@@ -209,16 +219,16 @@ cd "$INSTALL_DIR"
 sudo -u devliopay git config --global --add safe.directory "$INSTALL_DIR"
 print_ok "Repository cloned to ${INSTALL_DIR}"
 
-print_step 7 $TOTAL_STEPS "Installing PHP Dependencies"
+print_step 8 $TOTAL_STEPS "Installing PHP Dependencies"
 sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction
 print_ok "Composer packages installed"
 
-print_step 8 $TOTAL_STEPS "Installing Node Dependencies & Building Assets"
+print_step 9 $TOTAL_STEPS "Installing Node Dependencies & Building Assets"
 sudo -u devliopay npm install
 sudo -u devliopay npm run build
 print_ok "Frontend assets built"
 
-print_step 9 $TOTAL_STEPS "Environment Configuration"
+print_step 10 $TOTAL_STEPS "Environment Configuration"
 sudo -u devliopay cp .env.example .env
 
 # Ensure database directory and file are writable by devliopay
@@ -240,12 +250,12 @@ sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
 print_ok "Environment configured"
 
-print_step 10 $TOTAL_STEPS "Database Migration & Seeding"
+print_step 11 $TOTAL_STEPS "Database Migration & Seeding"
 sudo -u devliopay php artisan migrate --force --no-interaction
 sudo -u devliopay php artisan db:seed --force --no-interaction
 print_ok "Database migrated and seeded"
 
-print_step 11 $TOTAL_STEPS "Creating Admin User"
+print_step 12 $TOTAL_STEPS "Creating Admin User"
 sudo -u devliopay php artisan tinker --execute="
 \$user = App\Models\User::create([
     'name' => '${ADMIN_NAME}',
@@ -259,7 +269,7 @@ echo 'Admin user created: ' . \$user->email;
 " 2>&1
 print_ok "Admin user created: ${ADMIN_EMAIL}"
 
-print_step 12 $TOTAL_STEPS "Permissions, Cache & Nginx"
+print_step 13 $TOTAL_STEPS "Permissions, Cache & Nginx"
 chown -R devliopay:devliopay "$INSTALL_DIR"
 chmod -R 755 "$INSTALL_DIR"
 chmod -R 775 "$INSTALL_DIR/storage" 2>/dev/null || true
