@@ -46,10 +46,10 @@ class ReportsPage extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->form->fill([
+        $this->data = [
             'start_date' => now()->subDays(30)->format('Y-m-d'),
             'end_date' => now()->format('Y-m-d'),
-        ]);
+        ];
 
         $this->loadStats();
     }
@@ -80,20 +80,25 @@ class ReportsPage extends Page implements HasForms
 
     public function setPreset(string $preset): void
     {
-        $this->form->fill([
-            'start_date' => match ($preset) {
-                'today' => now()->format('Y-m-d'),
-                'yesterday' => now()->subDay()->format('Y-m-d'),
-                'week' => now()->startOfWeek()->format('Y-m-d'),
-                'month' => now()->startOfMonth()->format('Y-m-d'),
-                'quarter' => now()->startOfQuarter()->format('Y-m-d'),
-                'year' => now()->startOfYear()->format('Y-m-d'),
-                'last30' => now()->subDays(30)->format('Y-m-d'),
-                'last90' => now()->subDays(90)->format('Y-m-d'),
-                default => now()->subDays(30)->format('Y-m-d'),
-            },
-            'end_date' => now()->format('Y-m-d'),
-        ]);
+        $start = match ($preset) {
+            'today' => now()->format('Y-m-d'),
+            'yesterday' => now()->subDay()->format('Y-m-d'),
+            'week' => now()->startOfWeek()->format('Y-m-d'),
+            'month' => now()->startOfMonth()->format('Y-m-d'),
+            'quarter' => now()->startOfQuarter()->format('Y-m-d'),
+            'year' => now()->startOfYear()->format('Y-m-d'),
+            'last30' => now()->subDays(30)->format('Y-m-d'),
+            'last90' => now()->subDays(90)->format('Y-m-d'),
+            default => now()->subDays(30)->format('Y-m-d'),
+        };
+
+        $end = match ($preset) {
+            'yesterday' => now()->subDay()->format('Y-m-d'),
+            default => now()->format('Y-m-d'),
+        };
+
+        $this->data['start_date'] = $start;
+        $this->data['end_date'] = $end;
 
         $this->periodLabel = match ($preset) {
             'today' => 'Today',
@@ -112,7 +117,7 @@ class ReportsPage extends Page implements HasForms
 
     public function loadStats(): void
     {
-        $data = $this->form->getState();
+        $data = $this->data;
         $startDate = $data['start_date'] ?? now()->subDays(30)->format('Y-m-d');
         $endDate = $data['end_date'] ?? now()->format('Y-m-d');
 
