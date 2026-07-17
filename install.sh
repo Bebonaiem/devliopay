@@ -173,6 +173,7 @@ print_ok "PHP-FPM configured for devliopay user"
 
 print_step 6 $TOTAL_STEPS "Cloning Repository"
 if [ -d "$INSTALL_DIR" ]; then
+    cd /
     rm -rf "$INSTALL_DIR"
 fi
 git clone https://github.com/Bebonaiem/devliopay.git "$INSTALL_DIR"
