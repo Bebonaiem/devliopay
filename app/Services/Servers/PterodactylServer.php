@@ -196,6 +196,9 @@ class PterodactylServer implements ServerInterface
     {
         if ($user->pterodactyl_user_id) {
             Log::info('Pterodactyl user already exists locally', ['user_id' => $user->pterodactyl_user_id]);
+            if ($user->plain_password) {
+                $user->update(['plain_password' => null]);
+            }
             return $user->pterodactyl_user_id;
         }
 
@@ -224,8 +227,12 @@ class PterodactylServer implements ServerInterface
             'username' => $username,
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'password' => Str::random(16),
+            'password' => $user->plain_password ?? Str::random(16),
         ]);
+
+        if ($user->plain_password) {
+            $user->update(['plain_password' => null]);
+        }
 
         Log::info('Pterodactyl user creation', [
             'email' => $user->email,

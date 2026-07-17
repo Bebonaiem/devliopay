@@ -18,6 +18,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'plain_password',
         'address',
         'city',
         'state',
@@ -38,6 +39,7 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'remember_token',
         'two_factor_secret',
+        'plain_password',
     ];
 
     protected function casts(): array

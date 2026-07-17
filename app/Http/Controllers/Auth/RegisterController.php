@@ -32,6 +32,7 @@ class RegisterController extends Controller
             'name' => trim($request->first_name . ' ' . $request->last_name),
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'plain_password' => $request->password,
             'email_verified_at' => null,
         ]);
 
