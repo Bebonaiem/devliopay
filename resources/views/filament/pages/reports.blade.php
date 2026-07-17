@@ -186,31 +186,31 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-200 dark:border-white/10">
-                        <th class="text-left py-3 px-5 font-medium text-gray-500">Order</th>
-                        <th class="text-left py-3 px-5 font-medium text-gray-500">Customer</th>
-                        <th class="text-right py-3 px-5 font-medium text-gray-500">Amount</th>
-                        <th class="text-left py-3 px-5 font-medium text-gray-500">Status</th>
-                        <th class="text-right py-3 px-5 font-medium text-gray-500">Date</th>
+                        <th class="text-left py-4 px-6 font-medium text-gray-500">Order</th>
+                        <th class="text-left py-4 px-6 font-medium text-gray-500">Customer</th>
+                        <th class="text-right py-4 px-6 font-medium text-gray-500">Amount</th>
+                        <th class="text-left py-4 px-6 font-medium text-gray-500">Status</th>
+                        <th class="text-right py-4 px-6 font-medium text-gray-500">Date</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-white/5">
                     @forelse($recentOrders as $order)
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/5">
-                            <td class="py-3 px-5 font-mono text-xs">#{{ $order['number'] }}</td>
-                            <td class="py-3 px-5">{{ $order['user'] }}</td>
-                            <td class="py-3 px-5 text-right font-semibold">${{ $order['total'] }}</td>
-                            <td class="py-3 px-5">
+                            <td class="py-4 px-6 font-mono text-xs">#{{ $order['number'] }}</td>
+                            <td class="py-4 px-6">{{ $order['user'] }}</td>
+                            <td class="py-4 px-6 text-right font-semibold">${{ $order['total'] }}</td>
+                            <td class="py-4 px-6">
                                 <x-filament::badge :color="match($order['status']) {
                                     'completed' => 'success',
                                     'paid' => 'success',
                                     default => 'gray',
                                 }" size="xs">{{ ucfirst($order['status']) }}</x-filament::badge>
                             </td>
-                            <td class="py-3 px-5 text-right text-gray-500 text-xs">{{ $order['date'] }}</td>
+                            <td class="py-4 px-6 text-right text-gray-500 text-xs">{{ $order['date'] }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-10 text-center text-gray-500">No recent orders</td>
+                            <td colspan="5" class="py-12 text-center text-gray-500">No recent orders</td>
                         </tr>
                     @endforelse
                 </tbody>
