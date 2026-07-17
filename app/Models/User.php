@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->is_admin;
     }
 
+    public function canAccessPanel(): bool
+    {
+        return $this->is_admin;
+    }
+
     public function getFullNameAttribute(): string
     {
         return trim($this->name);
