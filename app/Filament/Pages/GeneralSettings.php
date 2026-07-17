@@ -35,6 +35,7 @@ class GeneralSettings extends Page implements HasForms
             'company_phone' => Setting::get('company_phone', ''),
             'company_address' => Setting::get('company_address', ''),
             'company_logo' => Setting::get('company_logo', ''),
+            'company_logo_display' => Setting::get('company_logo_display', 'name_only'),
             'company_footer_text' => Setting::get('company_footer_text', ''),
             'default_currency' => Setting::get('default_currency', 'USD'),
             'default_currency_symbol' => Setting::get('default_currency_symbol', '$'),
@@ -72,6 +73,14 @@ class GeneralSettings extends Page implements HasForms
                             ->disk('public')
                             ->directory('company')
                             ->columnSpanFull(),
+                        Forms\Components\Select::make('company_logo_display')
+                            ->label('Logo Display')
+                            ->options([
+                                'logo_only' => 'Logo Only',
+                                'logo_and_name' => 'Logo + Company Name',
+                                'name_only' => 'Company Name Only',
+                            ])
+                            ->default('name_only'),
                         Forms\Components\Textarea::make('company_footer_text')
                             ->label('Footer text shown to clients'),
                     ])->columns(2),

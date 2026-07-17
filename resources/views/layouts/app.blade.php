@@ -66,8 +66,11 @@
             <div class="flex items-center justify-between h-16">
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    @if($companyLogo)
+                    @if($companyLogoDisplay === 'logo_only' && $companyLogo)
                         <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="h-8 w-auto">
+                    @elseif($companyLogoDisplay === 'logo_and_name' && $companyLogo)
+                        <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="h-8 w-auto">
+                        <span class="text-lg font-bold tracking-tight">{{ $companyName }}</span>
                     @else
                         <span class="text-lg font-bold tracking-tight">{{ $companyName }}</span>
                     @endif
@@ -199,7 +202,14 @@
                 {{-- Brand --}}
                 <div class="lg:col-span-1">
                     <a href="{{ route('home') }}" class="flex items-center gap-3 mb-5">
-                        <span class="text-lg font-bold">{{ $companyName }}</span>
+                        @if($companyLogoDisplay === 'logo_only' && $companyLogo)
+                            <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="h-8 w-auto">
+                        @elseif($companyLogoDisplay === 'logo_and_name' && $companyLogo)
+                            <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="h-8 w-auto">
+                            <span class="text-lg font-bold">{{ $companyName }}</span>
+                        @else
+                            <span class="text-lg font-bold">{{ $companyName }}</span>
+                        @endif
                     </a>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6">{{ $companyFooterText ?: 'Premium hosting and game server solutions powered by cutting-edge infrastructure.' }}</p>
                     <div class="flex gap-3">
