@@ -115,12 +115,16 @@ setup_config() {
         echo -e "  ${CYAN}→ Generated: ${ADMIN_PASSWORD}${NC}"
     fi
 
-    echo ""
-    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
-    echo -e "${BOLD}  ${CYAN}Installation Summary${NC}"
-    echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
-    echo ""
-echo -e "  ${CYAN}URL:${NC}       ${APP_URL}"
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+echo -e "${BOLD}  ${CYAN}Installation Summary${NC}"
+echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
+echo ""
+if [ "$IS_IP" = true ]; then
+    echo -e "  ${CYAN}URL:${NC}       http://${DOMAIN}"
+else
+    echo -e "  ${CYAN}URL:${NC}       https://${DOMAIN}"
+fi
 echo -e "  ${CYAN}Admin:${NC}     ${ADMIN_EMAIL}"
 echo -e "  ${CYAN}Password:${NC}  ${ADMIN_PASSWORD}"
 if [ "$IS_IP" = true ]; then
@@ -143,7 +147,7 @@ print_banner
 setup_config
 
 # ─── Installation ──────────────────────────────────────────────────────────────
-TOTAL_STEPS=13
+TOTAL_STEPS=12
 
 print_step 1 $TOTAL_STEPS "System Update & Dependencies"
 
@@ -180,16 +184,11 @@ sed -i 's/upload_max_filesize = .*/upload_max_filesize = 64M/' /etc/php/8.3/fpm/
 sed -i 's/post_max_size = .*/post_max_size = 64M/' /etc/php/8.3/fpm/php.ini
 print_ok "PHP upload limits set to 64M"
 
-print_step 4 $TOTAL_STEPS "Installing Node.js 22.x & npm"
-curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-apt-get install -y nodejs
-print_ok "Node.js $(node -v) installed"
-
-print_step 5 $TOTAL_STEPS "Installing Composer"
+print_step 4 $TOTAL_STEPS "Installing Composer"
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 print_ok "Composer $(composer -V | head -1) installed"
 
-print_step 6 $TOTAL_STEPS "Setting up Web Server User"
+print_step 5 $TOTAL_STEPS "Setting up Web Server User"
 if ! id -g devliopay >/dev/null 2>&1; then
     addgroup --system devliopay
 fi
@@ -232,11 +231,7 @@ print_step 8 $TOTAL_STEPS "Installing PHP Dependencies"
 sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction
 print_ok "Composer packages installed"
 
-print_step 9 $TOTAL_STEPS "Building Frontend Assets"
-sudo -u devliopay npm install 2>/dev/null || true
-print_ok "Frontend dependencies ready"
-
-print_step 10 $TOTAL_STEPS "Environment Configuration"
+print_step 9 $TOTAL_STEPS "Environment Configuration"
 sudo -u devliopay cp .env.example .env
 
 # Ensure database directory and file are writable by devliopay
@@ -257,20 +252,34 @@ sed -i "s|APP_URL=http://localhost|APP_URL=${APP_URL}|g" .env
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
 
-# Session config for HTTPS
+# Set APP_DOMAIN
+APP_DOMAIN="${DOMAIN}"
+if grep -q "^APP_DOMAIN=" .env; then
+    sed -i "s|^APP_DOMAIN=.*|APP_DOMAIN=${APP_DOMAIN}|g" .env
+else
+    echo "APP_DOMAIN=${APP_DOMAIN}" >> .env
+fi
+
+# Session config
 if [ "$IS_IP" = false ]; then
     sed -i "s|SESSION_DOMAIN=null|SESSION_DOMAIN=.${DOMAIN}|g" .env
-    grep -q "^SESSION_SECURE_COOKIE=" .env || sed -i '/^SESSION_DOMAIN/a SESSION_SECURE_COOKIE=true' .env
+fi
+# Always set secure cookie and session lifetime for production
+grep -q "^SESSION_SECURE_COOKIE=" .env || sed -i '/^SESSION_DOMAIN/a SESSION_SECURE_COOKIE=true' .env
+grep -q "^SESSION_LIFETIME=" .env || sed -i '/^SESSION_SECURE_COOKIE/a SESSION_LIFETIME=120' .env
+# Ensure SESSION_DOMAIN is set for IP installs too (null -> null is fine)
+if [ "$IS_IP" = true ]; then
+    sed -i "s|SESSION_DOMAIN=null|SESSION_DOMAIN=null|g" .env
 fi
 
 print_ok "Environment configured"
 
-print_step 11 $TOTAL_STEPS "Database Migration & Seeding"
+print_step 10 $TOTAL_STEPS "Database Migration & Seeding"
 sudo -u devliopay php artisan migrate --force --no-interaction
 sudo -u devliopay php artisan db:seed --force --no-interaction
 print_ok "Database migrated and seeded"
 
-print_step 12 $TOTAL_STEPS "Creating Admin User"
+print_step 11 $TOTAL_STEPS "Creating Admin User"
 sudo -u devliopay php artisan tinker --execute="
 \$user = App\Models\User::create([
     'name' => '${ADMIN_NAME}',
@@ -284,7 +293,7 @@ echo 'Admin user created: ' . \$user->email;
 " 2>&1
 print_ok "Admin user created: ${ADMIN_EMAIL}"
 
-print_step 13 $TOTAL_STEPS "Permissions, Cache & Nginx"
+print_step 12 $TOTAL_STEPS "Permissions, Cache & Nginx"
 chown -R devliopay:devliopay "$INSTALL_DIR"
 chmod -R 755 "$INSTALL_DIR"
 chmod -R 775 "$INSTALL_DIR/storage" 2>/dev/null || true
@@ -420,6 +429,7 @@ echo ""
 echo -e "  ${YELLOW}⚠  Save these credentials! They won't be shown again.${NC}"
 echo -e "  ${YELLOW}⚠  Edit .env at ${INSTALL_DIR}/.env to configure${NC}"
 echo -e "  ${YELLOW}   Stripe, PayPal, Pterodactyl, and Mail settings.${NC}"
+echo -e "  ${YELLOW}   All settings can also be configured from the admin panel.${NC}"
 echo ""
 echo -e "  ${CYAN}Useful commands:${NC}"
 echo -e "  cd ${INSTALL_DIR}"
