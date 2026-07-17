@@ -20,12 +20,24 @@ class Addon extends Model
         'is_active',
         'is_required',
         'sort_order',
+        'extra_ram',
+        'extra_disk',
+        'extra_cpu',
+        'extra_databases',
+        'extra_allocations',
+        'extra_backups',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'is_active' => 'boolean',
         'is_required' => 'boolean',
+        'extra_ram' => 'integer',
+        'extra_disk' => 'integer',
+        'extra_cpu' => 'integer',
+        'extra_databases' => 'integer',
+        'extra_allocations' => 'integer',
+        'extra_backups' => 'integer',
     ];
 
     public function category()

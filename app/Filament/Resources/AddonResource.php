@@ -54,7 +54,7 @@ class AddonResource extends Resource
                         Forms\Components\TextInput::make('price')
                             ->required()
                             ->numeric()
-                            ->prefix(fn () => \App\Models\Currency::defaultSymbol())
+                            ->prefix(fn () => Currency::defaultSymbol())
                             ->minValue(0),
                         Forms\Components\Select::make('billing_interval')
                             ->options([
@@ -64,11 +64,46 @@ class AddonResource extends Resource
                                 'year' => 'Annually',
                                 'one_time' => 'One-Time',
                             ])
-                            ->default('month'),
+                            ->default('month')
+                            ->live(),
                         Forms\Components\TextInput::make('billing_period')
                             ->numeric()
                             ->default(1)
-                            ->helperText('Number of intervals between billings'),
+                            ->helperText('Number of intervals between billings')
+                            ->visible(fn (Forms\Get $get) => $get('billing_interval') !== 'one_time'),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Pterodactyl Resources')
+                    ->description('Extra resources this addon adds to a server when purchased')
+                    ->schema([
+                        Forms\Components\TextInput::make('extra_ram')
+                            ->numeric()
+                            ->default(0)
+                            ->suffix('MB')
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('extra_disk')
+                            ->numeric()
+                            ->default(0)
+                            ->suffix('MB')
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('extra_cpu')
+                            ->numeric()
+                            ->default(0)
+                            ->suffix('%')
+                            ->minValue(0)
+                            ->maxValue(1000),
+                        Forms\Components\TextInput::make('extra_databases')
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('extra_allocations')
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('extra_backups')
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Settings')
@@ -92,6 +127,9 @@ class AddonResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->limit(50)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
@@ -99,6 +137,21 @@ class AddonResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('billing_interval')
                     ->formatStateUsing(fn ($state) => ucfirst(str_replace('_', ' ', $state))),
+                Tables\Columns\TextColumn::make('billing_period')
+                    ->suffix('x')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('extra_ram')
+                    ->label('RAM')
+                    ->suffix('MB')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('extra_disk')
+                    ->label('Disk')
+                    ->suffix('MB')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('extra_cpu')
+                    ->label('CPU')
+                    ->suffix('%')
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->sortable(),
@@ -107,13 +160,24 @@ class AddonResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('service_addons_count')
                     ->counts('serviceAddons')
-                    ->label('Active')
+                    ->label('Installed')
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category_id')
                     ->relationship('category', 'name')
                     ->label('Category'),
+                Tables\Filters\SelectFilter::make('billing_interval')
+                    ->options([
+                        'month' => 'Monthly',
+                        'quarter' => 'Quarterly',
+                        'semi_annual' => 'Semi-Annually',
+                        'year' => 'Annually',
+                        'one_time' => 'One-Time',
+                    ])
+                    ->label('Billing'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

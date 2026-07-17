@@ -158,12 +158,73 @@ class ServiceController extends Controller
             'price' => $addon->price,
             'status' => 'active',
             'activated_at' => now(),
-            'next_billing_at' => $addon->billing_period ? now()->addUnit($addon->billing_period, $addon->billing_interval) : null,
+            'next_billing_at' => $addon->billing_interval === 'one_time' ? null : $this->calculateNextBilling($addon),
         ]);
+
+        if ($service->server_extension === 'pterodactyl' && $service->server_properties['server_id'] ?? null) {
+            $this->applyAddonResources($service, $addon);
+        }
 
         ActivityLogService::log('addon_purchased', $service, 'Client purchased addon: '.$addon->name);
 
         return redirect()->route('client.services.show', $service)
             ->with('success', 'Addon "'.$addon->name.'" has been added to your service');
+    }
+
+    private function calculateNextBilling(\App\Models\Addon $addon): \Carbon\Carbon
+    {
+        $period = $addon->billing_period ?? 1;
+        return match ($addon->billing_interval) {
+            'month' => now()->addMonths($period),
+            'quarter' => now()->addMonths($period * 3),
+            'semi_annual' => now()->addMonths($period * 6),
+            'year' => now()->addYears($period),
+            default => now()->addMonth(),
+        };
+    }
+
+    private function applyAddonResources(Service $service, \App\Models\Addon $addon): void
+    {
+        if (!$addon->extra_ram && !$addon->extra_disk && !$addon->extra_cpu && !$addon->extra_databases && !$addon->extra_allocations && !$addon->extra_backups) {
+            return;
+        }
+
+        try {
+            $serverId = $service->server_properties['server_id'] ?? null;
+            if (!$serverId) {
+                return;
+            }
+
+            $provisioning = new \App\Services\Servers\PterodactylServer;
+            $result = $provisioning->getServerInfo($service);
+
+            if (!$result['success']) {
+                \Illuminate\Support\Facades\Log::error('Failed to get server info for addon upgrade', [
+                    'service_id' => $service->id,
+                    'error' => $result['error'],
+                ]);
+                return;
+            }
+
+            $upgradeResult = $provisioning->upgradeServer($service, [], [
+                'ram' => ($result['memory'] ?? 0) + $addon->extra_ram,
+                'disk' => ($result['disk'] ?? 0) + $addon->extra_disk,
+                'cpu' => ($result['cpu'] ?? 0) + $addon->extra_cpu,
+            ]);
+
+            if (!$upgradeResult['success']) {
+                \Illuminate\Support\Facades\Log::error('Failed to upgrade server resources for addon', [
+                    'service_id' => $service->id,
+                    'addon_id' => $addon->id,
+                    'error' => $upgradeResult['error'],
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Exception applying addon resources', [
+                'service_id' => $service->id,
+                'addon_id' => $addon->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
