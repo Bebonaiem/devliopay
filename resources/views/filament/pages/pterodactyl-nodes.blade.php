@@ -102,26 +102,34 @@
 
                 <div class="min-w-[180px]">
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Node</label>
-                    <x-filament::input.select
-                        wire:model.live="filterNode"
-                        :options="array_merge(['' => 'All Nodes'], $this->getNodeOptions())"
-                    />
+                    <select wire:model.live="filterNode"
+                            class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                        <option value="">All Nodes</option>
+                        @foreach($this->getNodeOptions() as $nodeId => $nodeName)
+                            <option value="{{ $nodeId }}">{{ $nodeName }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="min-w-[150px]">
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Status</label>
-                    <x-filament::input.select
-                        wire:model.live="filterStatus"
-                        :options="['' => 'All', 'assigned' => 'Assigned', 'free' => 'Free']"
-                    />
+                    <select wire:model.live="filterStatus"
+                            class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                        <option value="">All</option>
+                        <option value="assigned">Assigned</option>
+                        <option value="free">Free</option>
+                    </select>
                 </div>
 
                 <div class="min-w-[120px]">
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Per Page</label>
-                    <x-filament::input.select
-                        wire:model.live="allocPerPage"
-                        :options="[10 => '10', 25 => '25', 50 => '50', 100 => '100']"
-                    />
+                    <select wire:model.live="allocPerPage"
+                            class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1c2e] px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
                 </div>
             </div>
 
