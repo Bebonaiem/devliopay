@@ -128,6 +128,20 @@ php artisan icon:cache --no-interaction 2>/dev/null || true
 
 # ─── Nginx Configuration ──────────────────────────────────────────────────────
 echo -e "${YELLOW}Setting up Nginx...${NC}"
+
+# Detect PHP-FPM socket
+PHP_FPM_SOCK=$(find /var/run/php -name "php*-fpm.sock" 2>/dev/null | head -1)
+if [ -z "$PHP_FPM_SOCK" ]; then
+    # Ensure php-fpm is installed and started
+    apt-get install -y php8.3-fpm 2>/dev/null || true
+    systemctl start php8.3-fpm 2>/dev/null || true
+    PHP_FPM_SOCK=$(find /var/run/php -name "php*-fpm.sock" 2>/dev/null | head -1)
+fi
+if [ -z "$PHP_FPM_SOCK" ]; then
+    PHP_FPM_SOCK="/var/run/php/php8.3-fpm.sock"
+fi
+echo -e "${CYAN}Using PHP-FPM socket: ${PHP_FPM_SOCK}${NC}"
+
 cat > /etc/nginx/sites-available/devliopay <<NGINX
 server {
     listen 80;
@@ -152,7 +166,7 @@ server {
     error_page 404 /index.php;
 
     location ~ \.php\$ {
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:${PHP_FPM_SOCK};
         fastcgi_param SCRIPT_FILENAME \$real_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
@@ -170,7 +184,8 @@ ln -sf /etc/nginx/sites-available/devliopay /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 
 # Restart services
-systemctl restart php8.3-fpm
+PHP_FPM_VERSION=$(echo "$PHP_FPM_SOCK" | sed -E 's|.*php([0-9.]+)-fpm.*|\1|')
+systemctl restart "php${PHP_FPM_VERSION}-fpm" 2>/dev/null || systemctl restart php8.3-fpm 2>/dev/null || true
 systemctl restart nginx
 
 # ─── Setup Queue Worker (systemd) ─────────────────────────────────────────────
