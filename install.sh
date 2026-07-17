@@ -26,7 +26,23 @@ print_banner() {
 }
 
 # ─── Configuration ─────────────────────────────────────────────────────────────
-DOMAIN="${1:-localhost}"
+DOMAIN="${1:-}"
+
+# If no argument passed, prompt the user
+if [ -z "$DOMAIN" ]; then
+    echo -e "${CYAN}Enter your domain name or server IP (e.g. devliopay.com or 123.45.67.89):${NC}"
+    read -r DOMAIN
+fi
+
+# Default to localhost if still empty
+DOMAIN="${DOMAIN:-localhost}"
+
+# Detect if input is an IP address or a domain
+IS_IP=false
+if echo "$DOMAIN" | grep -qE '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
+    IS_IP=true
+fi
+
 INSTALL_DIR="/var/www/devliopay"
 ADMIN_NAME="Admin"
 ADMIN_EMAIL="admin@${DOMAIN}"
@@ -90,7 +106,7 @@ chmod 664 database/database.sqlite
 chown devliopay:devliopay database/database.sqlite
 
 # Update .env
-sed -i "s|APP_URL=http://localhost|APP_URL=http://${DOMAIN}|g" .env
+sed -i "s|APP_URL=http://localhost|APP_URL=${APP_URL}|g" .env
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
 sed -i "s|MAIL_MAILER=log|MAIL_MAILER=smtp|g" .env
@@ -142,11 +158,20 @@ if [ -z "$PHP_FPM_SOCK" ]; then
 fi
 echo -e "${CYAN}Using PHP-FPM socket: ${PHP_FPM_SOCK}${NC}"
 
+# For IPs, use _ to match all requests; for domains use the actual domain
+if [ "$IS_IP" = true ]; then
+    NGINX_SERVER_NAME="_"
+    APP_URL="http://${DOMAIN}"
+else
+    NGINX_SERVER_NAME="${DOMAIN}"
+    APP_URL="http://${DOMAIN}"
+fi
+
 cat > /etc/nginx/sites-available/devliopay <<NGINX
 server {
     listen 80;
     listen [::]:80;
-    server_name ${DOMAIN};
+    server_name ${NGINX_SERVER_NAME};
     root ${INSTALL_DIR}/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
@@ -215,7 +240,7 @@ CRON_LINE="* * * * * cd ${INSTALL_DIR} && php artisan schedule:run >> /dev/null 
 (crontab -l 2>/dev/null | grep -v "artisan schedule:run" ; echo "$CRON_LINE") | crontab -
 
 # ─── SSL Certificate (optional) ──────────────────────────────────────────────
-if [ "$DOMAIN" != "localhost" ]; then
+if [ "$IS_IP" = false ] && [ "$DOMAIN" != "localhost" ]; then
     echo -e "${YELLOW}Setting up SSL certificate...${NC}"
     certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "admin@${DOMAIN}" || true
 fi
@@ -225,7 +250,7 @@ echo -e "${GREEN}============================================================${N
 echo -e "${GREEN}  DevlioPay Installation Complete!${NC}"
 echo -e "${GREEN}============================================================${NC}"
 echo ""
-echo -e "  ${CYAN}URL:${NC}       http://${DOMAIN}"
+echo -e "  ${CYAN}URL:${NC}       ${APP_URL}"
 echo -e "  ${CYAN}Admin:${NC}     ${ADMIN_EMAIL}"
 echo -e "  ${CYAN}Password:${NC}  ${ADMIN_PASSWORD}"
 echo ""
