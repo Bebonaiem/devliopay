@@ -36,6 +36,16 @@ class LoginController extends Controller
                 ])->onlyInput('email');
             }
 
+            if (Auth::user()->two_factor_enabled && !Auth::user()->is_admin) {
+                $userId = Auth::id();
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                $request->session()->put('2fa_user_id', $userId);
+
+                return redirect()->route('two-factor.challenge');
+            }
+
             if (Auth::user()->is_admin) {
                 return redirect()->intended('/admin');
             }
