@@ -9,11 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('invoices', function (Blueprint $table) {
-            $table->unique('number');
+            if (!Schema::hasIndex('invoices', 'invoices_number_unique')) {
+                $table->unique('number');
+            }
         });
 
         Schema::table('orders', function (Blueprint $table) {
-            $table->unique('number');
+            if (!Schema::hasIndex('orders', 'orders_number_unique')) {
+                $table->unique('number');
+            }
         });
     }
 
