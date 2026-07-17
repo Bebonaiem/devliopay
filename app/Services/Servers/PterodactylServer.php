@@ -191,36 +191,54 @@ class PterodactylServer implements ServerInterface
     private function getOrCreateUser($user): int
     {
         if ($user->pterodactyl_user_id) {
+            Log::info('Pterodactyl user already exists locally', ['user_id' => $user->pterodactyl_user_id]);
             return $user->pterodactyl_user_id;
         }
 
-        $result = $this->makeRequest('get', '/users?email='.urlencode($user->email));
+        $result = $this->makeRequest('get', '/users?filter[email]='.urlencode($user->email));
 
-        if ($result['success'] && ! empty($result['data']['data'])) {
-            $pteroUserId = $result['data']['data'][0]['attributes']['id'];
-            $user->update(['pterodactyl_user_id' => $pteroUserId]);
-
-            return $pteroUserId;
-        }
-
-        $result = $this->makeRequest('post', '/users', [
+        Log::info('Pterodactyl user search by email', [
             'email' => $user->email,
-            'username' => Str::slug($user->name).'-'.Str::random(4),
-            'first_name' => explode(' ', $user->name)[0] ?? $user->name,
-            'last_name' => implode(' ', array_slice(explode(' ', $user->name), 1)) ?: '',
-            'password' => Str::random(16),
+            'success' => $result['success'],
+            'found' => ! empty($result['data']['data']),
         ]);
 
-        if ($result['success']) {
-            $pteroUserId = $result['data']['attributes']['id'] ?? 0;
+        if ($result['success'] && ! empty($result['data']['data'])) {
+            $pteroUserId = $result['data']['data'][0]['attributes']['id'] ?? 0;
             if ($pteroUserId) {
                 $user->update(['pterodactyl_user_id' => $pteroUserId]);
             }
-
             return $pteroUserId;
         }
 
-        Log::error('Failed to create Pterodactyl user', ['email' => $user->email, 'error' => $result['error'] ?? 'Unknown']);
+        $username = Str::slug($user->name).'-'.Str::random(4);
+        $firstName = explode(' ', $user->name)[0] ?? $user->name;
+        $lastName = implode(' ', array_slice(explode(' ', $user->name), 1)) ?: '';
+
+        $createResult = $this->makeRequest('post', '/users', [
+            'email' => $user->email,
+            'username' => $username,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'password' => Str::random(16),
+        ]);
+
+        Log::info('Pterodactyl user creation', [
+            'email' => $user->email,
+            'username' => $username,
+            'success' => $createResult['success'],
+            'error' => $createResult['success'] ? null : ($createResult['error'] ?? 'Unknown'),
+        ]);
+
+        if ($createResult['success']) {
+            $pteroUserId = $createResult['data']['attributes']['id'] ?? 0;
+            if ($pteroUserId) {
+                $user->update(['pterodactyl_user_id' => $pteroUserId]);
+            }
+            return $pteroUserId;
+        }
+
+        Log::error('Failed to create Pterodactyl user', ['email' => $user->email, 'error' => $createResult['error'] ?? 'Unknown']);
 
         return 0;
     }
