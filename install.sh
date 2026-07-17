@@ -55,37 +55,45 @@ if [ ! -t 0 ]; then
     exit 1
 fi
 
-# ─── Interactive Setup Menu ────────────────────────────────────────────────────
+# ─── Detect if input is IP or domain ──────────────────────────────────────────
+detect_input_type() {
+    local input="$1"
+    # Match IPv4 pattern: digits.digits.digits.digits
+    if [[ "$input" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        IS_IP=true
+    else
+        IS_IP=false
+    fi
+}
+
+# ─── Interactive Setup ────────────────────────────────────────────────────────
 setup_config() {
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
-    echo -e "${BOLD}  ${CYAN}Installation Type${NC}"
+    echo -e "${BOLD}  ${CYAN}Server Address${NC}"
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "  ${CYAN}1)${NC} Use Server IP address"
-    echo -e "  ${CYAN}2)${NC} Use Domain name"
+    echo -e "  Enter your ${CYAN}server IP${NC} or ${CYAN}domain name${NC}"
+    echo ""
+    echo -e "  ${CYAN}Examples:${NC}"
+    echo -e "    IP:       123.45.67.89"
+    echo -e "    Domain:   devliopay.com"
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
-    read -rp "  Choose [1-2]: " INSTALL_TYPE
+    read -rp "  IP or Domain: " DOMAIN
 
-    case "$INSTALL_TYPE" in
-        1)
-            echo ""
-            read -rp "  Enter your server IP (e.g. 123.45.67.89): " DOMAIN
-            IS_IP=true
-            ;;
-        2)
-            echo ""
-            read -rp "  Enter your domain (e.g. devliopay.com): " DOMAIN
-            IS_IP=false
-            ;;
-        *)
-            echo -e "${RED}Invalid choice. Exiting.${NC}"
-            exit 1
-            ;;
-    esac
+    if [ -z "$DOMAIN" ]; then
+        DOMAIN="localhost"
+    fi
 
-    DOMAIN="${DOMAIN:-localhost}"
+    detect_input_type "$DOMAIN"
+
+    if [ "$IS_IP" = true ]; then
+        print_info "Detected: Server IP"
+    else
+        print_info "Detected: Domain name"
+    fi
+
     INSTALL_DIR="/var/www/devliopay"
 
     echo ""
@@ -115,6 +123,7 @@ setup_config() {
     echo -e "  ${CYAN}URL:${NC}      http://${DOMAIN}"
     echo -e "  ${CYAN}Admin:${NC}    ${ADMIN_EMAIL}"
     echo -e "  ${CYAN}Password:${NC} ${ADMIN_PASSWORD}"
+    echo -e "  ${CYAN}SSL:${NC}      None (HTTP only)"
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
@@ -135,7 +144,7 @@ TOTAL_STEPS=12
 print_step 1 $TOTAL_STEPS "System Update & Dependencies"
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3 certbot python3-certbot-nginx
+apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3
 print_ok "System packages installed"
 
 print_step 2 $TOTAL_STEPS "Installing PHP 8.3+ & Extensions"
@@ -347,13 +356,6 @@ print_info "Setting up scheduler..."
 CRON_LINE="* * * * * cd ${INSTALL_DIR} && php artisan schedule:run >> /dev/null 2>&1"
 (crontab -l 2>/dev/null | grep -v "artisan schedule:run" ; echo "$CRON_LINE") | crontab -
 print_ok "Scheduler configured"
-
-# ─── SSL ───────────────────────────────────────────────────────────────────────
-if [ "$IS_IP" = false ] && [ "$DOMAIN" != "localhost" ]; then
-    print_info "Setting up SSL certificate..."
-    certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "admin@${DOMAIN}" || true
-    print_ok "SSL configured"
-fi
 
 # ─── Done ──────────────────────────────────────────────────────────────────────
 echo ""
