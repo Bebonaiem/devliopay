@@ -15,7 +15,10 @@ class StoreController extends Controller
             ->with(['category', 'pricing.currencies']);
 
         if ($request->category) {
-            $query->where('category_id', $request->category);
+            $category = Category::where('slug', $request->category)->first();
+            if ($category) {
+                $query->where('category_id', $category->id);
+            }
         }
 
         $products = $query->orderBy('sort_order')->get();
