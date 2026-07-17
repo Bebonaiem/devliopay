@@ -120,14 +120,14 @@ setup_config() {
     echo -e "${BOLD}  ${CYAN}Installation Summary${NC}"
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "  ${CYAN}URL:${NC}      ${APP_URL}"
-    echo -e "  ${CYAN}Admin:${NC}    ${ADMIN_EMAIL}"
-    echo -e "  ${CYAN}Password:${NC} ${ADMIN_PASSWORD}"
-    if [ "$IS_IP" = true ]; then
-        echo -e "  ${CYAN}SSL:${NC}      None (HTTP only)"
-    else
-        echo -e "  ${CYAN}SSL:${NC}      Cloudflare (HTTPS)"
-    fi
+echo -e "  ${CYAN}URL:${NC}       ${APP_URL}"
+echo -e "  ${CYAN}Admin:${NC}     ${ADMIN_EMAIL}"
+echo -e "  ${CYAN}Password:${NC}  ${ADMIN_PASSWORD}"
+if [ "$IS_IP" = true ]; then
+    echo -e "  ${CYAN}SSL:${NC}      None (HTTP)"
+else
+    echo -e "  ${CYAN}SSL:${NC}      Let's Encrypt (auto-renewed)"
+fi
     echo ""
     echo -e "${BOLD}══════════════════════════════════════════════════════════════${NC}"
     echo ""
@@ -257,9 +257,11 @@ sed -i "s|APP_URL=http://localhost|APP_URL=${APP_URL}|g" .env
 sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
 sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
 
-# Session config for Cloudflare/HTTPS proxy
-sed -i "s|SESSION_DOMAIN=null|SESSION_DOMAIN=.${DOMAIN}|g" .env
-grep -q "^SESSION_SECURE_COOKIE=" .env || sed -i '/^SESSION_DOMAIN/a SESSION_SECURE_COOKIE=true' .env
+# Session config for HTTPS
+if [ "$IS_IP" = false ]; then
+    sed -i "s|SESSION_DOMAIN=null|SESSION_DOMAIN=.${DOMAIN}|g" .env
+    grep -q "^SESSION_SECURE_COOKIE=" .env || sed -i '/^SESSION_DOMAIN/a SESSION_SECURE_COOKIE=true' .env
+fi
 
 print_ok "Environment configured"
 
@@ -341,9 +343,6 @@ server {
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
-        # Cloudflare proxy headers
-        fastcgi_param HTTP_X_FORWARDED_FOR \$http_x_forwarded_for;
-        fastcgi_param HTTP_X_FORWARDED_PROTO \$http_x_forwarded_proto;
     }
 
     location ~ /\.(?!well-known).* {
@@ -360,6 +359,22 @@ rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 systemctl restart php8.3-fpm
 systemctl restart nginx
 print_ok "Nginx configured and running"
+
+# ─── SSL Certificate (domains only) ──────────────────────────────────────────
+if [ "$IS_IP" = false ]; then
+    print_info "Installing Certbot and obtaining SSL certificate..."
+    apt-get install -y certbot python3-certbot-nginx
+
+    # Certbot will configure nginx SSL automatically
+    certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos --email "admin@${DOMAIN}" --redirect || {
+        print_error "Certbot failed. Site running on HTTP only."
+        print_info "You can retry later: certbot --nginx -d ${DOMAIN}"
+    }
+
+    # Auto-renewal cron
+    echo "0 12 * * * /usr/bin/certbot renew --quiet" | crontab -
+    print_ok "SSL certificate installed"
+fi
 
 # ─── Queue Worker ──────────────────────────────────────────────────────────────
 print_info "Setting up queue worker..."
