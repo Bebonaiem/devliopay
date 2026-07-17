@@ -73,6 +73,26 @@ class AddonResource extends Resource
                             ->visible(fn (Forms\Get $get) => $get('billing_interval') !== 'one_time'),
                     ])->columns(3),
 
+                Forms\Components\Section::make('Settings')
+                    ->schema([
+                        Forms\Components\Select::make('server_extension')
+                            ->options([
+                                '' => 'All Extensions',
+                                'pterodactyl' => 'Pterodactyl',
+                            ])
+                            ->nullable()
+                            ->live()
+                            ->helperText('Limit this addon to a specific server extension'),
+                        Forms\Components\Toggle::make('is_active')
+                            ->default(true),
+                        Forms\Components\Toggle::make('is_required')
+                            ->default(false)
+                            ->helperText('Required addons are automatically added to all services'),
+                        Forms\Components\TextInput::make('sort_order')
+                            ->numeric()
+                            ->default(0),
+                    ])->columns(3),
+
                 Forms\Components\Section::make('Pterodactyl Resources')
                     ->description('Extra resources this addon adds to a server when purchased')
                     ->schema([
@@ -106,26 +126,6 @@ class AddonResource extends Resource
                             ->minValue(0),
                     ])->columns(3)
                     ->visible(fn (Forms\Get $get) => $get('server_extension') === 'pterodactyl'),
-
-                Forms\Components\Section::make('Settings')
-                    ->schema([
-                        Forms\Components\Select::make('server_extension')
-                            ->options([
-                                '' => 'All Extensions',
-                                'pterodactyl' => 'Pterodactyl',
-                            ])
-                            ->nullable()
-                            ->live()
-                            ->helperText('Limit this addon to a specific server extension'),
-                        Forms\Components\Toggle::make('is_active')
-                            ->default(true),
-                        Forms\Components\Toggle::make('is_required')
-                            ->default(false)
-                            ->helperText('Required addons are automatically added to all services'),
-                        Forms\Components\TextInput::make('sort_order')
-                            ->numeric()
-                            ->default(0),
-                    ])->columns(3),
             ]);
     }
 
