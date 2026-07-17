@@ -10,7 +10,7 @@
         <div class="space-y-4 mb-8">
             @foreach($items as $key => $item)
             @php $allowsQty = in_array($item['product']->allow_quantity ?? 'no', ['separated', 'combined']); @endphp
-            @php $itemSymbol = $item['pricing']->currencies->first()?->symbol ?? $defaultCurrencySymbol; @endphp
+            @php $itemSymbol = $item['currency_symbol'] ?? $defaultCurrencySymbol; @endphp
             <div class="glass rounded-2xl p-5">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center flex-shrink-0">
@@ -60,7 +60,7 @@
         </div>
 
         {{-- Summary --}}
-        @php $summarySymbol = $items[array_key_first($items)]['pricing']->currencies->first()?->symbol ?? $defaultCurrencySymbol; @endphp
+        @php $summarySymbol = $items[array_key_first($items)]['currency_symbol'] ?? $defaultCurrencySymbol; @endphp
         <div class="glass rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-400">Subtotal</span>

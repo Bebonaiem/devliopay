@@ -36,6 +36,7 @@ class CartController extends Controller
                 $price = $pivotCurrency?->pivot->amount ?? 0;
                 $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;
                 $qty = $item['quantity'] ?? 1;
+                $currencySymbol = $pivotCurrency?->symbol ?? $defaultCurrencySymbol;
                 $items[$key] = [
                     'product' => $product,
                     'pricing' => $pricing,
@@ -43,6 +44,7 @@ class CartController extends Controller
                     'setup_fee' => $setupFee,
                     'quantity' => $qty,
                     'line_total' => ($price * $qty) + $setupFee,
+                    'currency_symbol' => $currencySymbol,
                 ];
                 $subtotal += ($price * $qty) + $setupFee;
             }

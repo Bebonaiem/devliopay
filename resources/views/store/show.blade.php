@@ -154,6 +154,12 @@ function updatePlan(currencies, planId) {
         var sf = parseFloat(c.setup_fee) || 0;
         document.getElementById('setup-fee-line').style.display = sf > 0 ? 'flex' : 'none';
         document.getElementById('setup-fee-amount').textContent = c.symbol + sf.toFixed(2);
+
+        var priceEl = document.querySelector('.plan-price[data-plan-id="' + planId + '"]');
+        if (priceEl) {
+            var freq = priceEl.querySelector('span')?.textContent || '/mo';
+            priceEl.innerHTML = c.symbol + parseFloat(c.amount).toFixed(2) + '<span class="text-gray-500 font-normal">' + freq + '</span>';
+        }
     }
 
     document.querySelectorAll('.currency-options').forEach(el => el.style.display = 'none');
@@ -167,6 +173,13 @@ function selectCurrency(btn, currencyId, symbol, code, amount, setupFee) {
     var sf = parseFloat(setupFee) || 0;
     document.getElementById('setup-fee-line').style.display = sf > 0 ? 'flex' : 'none';
     document.getElementById('setup-fee-amount').textContent = symbol + sf.toFixed(2);
+
+    var checkedPricingId = document.querySelector('input[name="pricing_id"]:checked')?.value;
+    var priceEl = document.querySelector('.plan-price[data-plan-id="' + checkedPricingId + '"]');
+    if (priceEl) {
+        var freq = priceEl.querySelector('span')?.textContent || '/mo';
+        priceEl.innerHTML = symbol + parseFloat(amount).toFixed(2) + '<span class="text-gray-500 font-normal">' + freq + '</span>';
+    }
 
     var parent = btn.closest('.currency-options');
     parent.querySelectorAll('.currency-btn').forEach(b => {
