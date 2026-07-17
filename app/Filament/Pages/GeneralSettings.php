@@ -60,8 +60,7 @@ class GeneralSettings extends Page implements HasForms
                         Forms\Components\TextInput::make('company_url')
                             ->label('Website URL')
                             ->url()
-                            ->default(url('/'))
-                            ->dehydrated(fn ($state) => $this->syncUrlToEnv($state)),
+                            ->default(url('/')),
                         Forms\Components\TextInput::make('company_phone')
                             ->label('Phone Number'),
                         Forms\Components\Textarea::make('company_address')
