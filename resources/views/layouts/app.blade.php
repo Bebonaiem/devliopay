@@ -15,13 +15,13 @@
     <meta property="og:site_name" content="{{ $companyName }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    @if($companyOgImage)
-        <meta property="og:image" content="{{ $companyOgImage }}">
+    @if($announcementOgImage ?? $companyOgImage ?? false)
+        <meta property="og:image" content="{{ $announcementOgImage ?? $companyOgImage }}">
     @endif
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', $companyName)">
-    @if($companyOgImage)
-        <meta name="twitter:image" content="{{ $companyOgImage }}">
+    @if($announcementOgImage ?? $companyOgImage ?? false)
+        <meta name="twitter:image" content="{{ $announcementOgImage ?? $companyOgImage }}">
     @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

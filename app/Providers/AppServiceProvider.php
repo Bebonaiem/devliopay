@@ -52,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('companyFooterText', Setting::get('company_footer_text', ''));
             $view->with('defaultCurrency', Setting::get('default_currency', 'USD'));
             $view->with('defaultCurrencySymbol', Setting::get('default_currency_symbol', '$'));
+            $view->with('announcementOgImage', null);
         });
     }
 }

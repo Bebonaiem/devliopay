@@ -21,6 +21,8 @@ class AnnouncementController extends Controller
             ->where('status', 'published')
             ->firstOrFail();
 
+        view()->share('announcementOgImage', $announcement->image ? asset('storage/' . $announcement->image) : null);
+
         return view('announcements.show', compact('announcement'));
     }
 }
