@@ -2,12 +2,12 @@
     <div class="space-y-4">
         <div class="flex gap-2 flex-wrap">
             <button wire:click="$set('filterType', null)"
-                    class="px-3 py-1 text-sm rounded-lg {{ is_null($filterType) ? 'bg-primary-600 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/20' }}">
+                    class="px-3 py-1 text-sm rounded-lg {{ is_null($filterType) ? 'bg-primary-600 text-white' : 'bg-gray-200 dark:bg-white/10 text-white hover:bg-gray-300 dark:hover:bg-white/20' }}">
                 All
             </button>
             @foreach($this->getTypes() as $type)
                 <button wire:click="$set('filterType', '{{ $type }}')"
-                        class="px-3 py-1 text-sm rounded-lg {{ $filterType === $type ? 'bg-primary-600 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/20' }}">
+                        class="px-3 py-1 text-sm rounded-lg {{ $filterType === $type ? 'bg-primary-600 text-white' : 'bg-gray-200 dark:bg-white/10 text-white hover:bg-gray-300 dark:hover:bg-white/20' }}">
                     {{ ucwords(str_replace('_', ' ', $type)) }}
                 </button>
             @endforeach
@@ -19,18 +19,18 @@
             <table class="w-full">
                 <thead class="bg-gray-50 dark:bg-white/5">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase">IP</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10">
                     @forelse($logs as $log)
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/5">
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $log->created_at->format('M d, Y H:i') }}</td>
-                            <td class="px-6 py-4 text-sm font-medium">{{ $log->user->name ?? 'System' }}</td>
+                            <td class="px-6 py-4 text-sm text-white">{{ $log->created_at->format('M d, Y H:i') }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-white">{{ $log->user->name ?? 'System' }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full font-medium
                                     {{ match(true) {
@@ -42,14 +42,14 @@
                                     {{ ucwords(str_replace('_', ' ', $log->type)) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">{{ $log->description }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 font-mono">{{ $log->ip_address ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-white max-w-xs truncate">{{ $log->description }}</td>
+                            <td class="px-6 py-4 text-sm text-white font-mono">{{ $log->ip_address ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="5" class="px-6 py-12 text-center text-white">
                                 <i class="fas fa-clock text-gray-300 text-4xl mb-3 block"></i>
-                                No activity logs found.
+                                No activity logs found
                             </td>
                         </tr>
                     @endforelse
@@ -58,7 +58,7 @@
         </div>
 
         <div class="flex justify-between items-center">
-            <span class="text-sm text-gray-500">
+            <span class="text-sm text-white">
                 Showing {{ $logs->firstItem() ?? 0 }} to {{ $logs->lastItem() ?? 0 }} of {{ $logs->total() }} entries
             </span>
             <div class="flex gap-1">
