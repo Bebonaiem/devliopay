@@ -8,11 +8,13 @@ use App\Models\Setting;
 use App\Services\ActivityLogService;
 use App\Services\Servers\PterodactylServer;
 use App\Services\ServerProvisioningService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class ServiceController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
         $services = auth()->user()->services()
