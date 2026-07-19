@@ -97,7 +97,7 @@ class LogViewer extends Page
     private function parseLogEntries(string $content): array
     {
         $entries = [];
-        $pattern = '/^\[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[^\]]*)\] (\w+)\.(\w+): (.+)/';
+        $pattern = '/^\[(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}[^\]]*)\] (\w+)\.(\w+): (.+)/';
 
         foreach (explode("\n", $content) as $line) {
             $line = trim($line);
