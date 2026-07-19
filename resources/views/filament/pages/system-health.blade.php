@@ -9,7 +9,7 @@
         {{-- Health Status Overview --}}
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             @foreach($healthChecks as $key => $check)
-                <div class="bg-white dark:bg-white/5 rounded-xl p-4 shadow-sm border-l-4 {{ match($check['status']) { 'success' => 'border-green-500', 'warning' => 'border-yellow-500', 'danger' => 'border-red-500', default => 'border-gray-500' } }}">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border-l-4 {{ match($check['status']) { 'success' => 'border-green-500', 'warning' => 'border-yellow-500', 'danger' => 'border-red-500', default => 'border-gray-500' } }}">
                     <div class="flex items-center gap-2">
                         <div class="w-2.5 h-2.5 rounded-full {{ $healthDot($check['status']) }}"></div>
                         <div>
@@ -29,7 +29,7 @@
                 {{-- Health Checks Detail --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach($healthChecks as $key => $check)
-                        <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                        <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                             <div class="flex items-center gap-2 mb-4">
                                 <div class="w-2.5 h-2.5 rounded-full {{ $healthDot($check['status']) }}"></div>
                                 <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">{{ $check['label'] }}</h3>
@@ -55,7 +55,7 @@
                 </div>
 
                 {{-- Recent Activity Tabs --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <div x-data="{ tab: 'orders' }">
                         <div class="flex items-center gap-1 mb-4 border-b border-gray-200 dark:border-white/10 pb-3">
                             <button @click="tab = 'orders'" :class="{ 'bg-gray-100 dark:bg-white/10 font-medium': tab === 'orders' }" class="px-3 py-1.5 text-sm rounded-lg transition text-gray-600 dark:text-gray-400">Recent Orders</button>
@@ -127,7 +127,7 @@
             <div class="space-y-6">
 
                 {{-- Key Metrics --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Platform Metrics</h3>
                     <div class="space-y-3">
                         @php
@@ -150,7 +150,7 @@
                 </div>
 
                 {{-- Revenue Trend --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Revenue Trend</h3>
                     <div class="space-y-3">
                         @php $maxRevenue = max($stats['revenue_this_month'], $stats['revenue_last_month'], 1); @endphp
@@ -182,7 +182,7 @@
                 </div>
 
                 {{-- Disk Usage --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">Disk Usage</h3>
                     <div class="mb-3">
                         @php $pct = $systemInfo['disk_usage']['percent']; $barColor = $pct >= 90 ? 'bg-red-500' : ($pct >= 80 ? 'bg-yellow-500' : 'bg-green-500'); @endphp
@@ -207,7 +207,7 @@
                 </div>
 
                 {{-- PHP Extensions --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">PHP Extensions</h3>
                     <div class="grid grid-cols-2 gap-2">
                         @foreach($systemInfo['extensions'] as $name => $loaded)
@@ -220,7 +220,7 @@
                 </div>
 
                 {{-- System Info --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-5 shadow-sm">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">System Details</h3>
                     <div class="space-y-2 text-sm">
                         @php
