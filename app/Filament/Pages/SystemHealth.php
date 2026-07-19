@@ -338,14 +338,4 @@ class SystemHealth extends Page
         }
         return $results;
     }
-
-    private function statusColor(string $status): string
-    {
-        return match ($status) {
-            'success' => 'text-success-500',
-            'warning' => 'text-warning-500',
-            'danger' => 'text-danger-500',
-            default => 'text-gray-500',
-        };
-    }
 }
