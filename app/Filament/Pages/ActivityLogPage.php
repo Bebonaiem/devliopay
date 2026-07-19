@@ -40,4 +40,19 @@ class ActivityLogPage extends Page
     {
         return ActivityLog::distinct()->pluck('type')->sort()->toArray();
     }
+
+    public function previousPage(): void
+    {
+        $this->page = max(1, $this->page - 1);
+    }
+
+    public function nextPage(): void
+    {
+        $this->page++;
+    }
+
+    public function gotoPage(int $page): void
+    {
+        $this->page = max(1, $page);
+    }
 }
