@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class StripeGateway implements GatewayInterface
 {
+    private const API_VERSION = '2025-04-30';
+
     private string $secretKey;
 
     private string $publishableKey;
@@ -366,7 +368,7 @@ class StripeGateway implements GatewayInterface
     {
         $http = Http::withHeaders([
             'Authorization' => 'Bearer '.$this->secretKey,
-            'Stripe-Version' => '2026-03-25.dahlia',
+            'Stripe-Version' => self::API_VERSION,
         ])->asForm()->timeout(30);
 
         if (app()->environment('local', 'testing')) {
@@ -380,7 +382,7 @@ class StripeGateway implements GatewayInterface
     {
         $http = Http::withHeaders([
             'Authorization' => 'Bearer '.$this->secretKey,
-            'Stripe-Version' => '2026-03-25.dahlia',
+            'Stripe-Version' => self::API_VERSION,
         ])->timeout(30);
 
         if (app()->environment('local', 'testing')) {

@@ -144,8 +144,8 @@ class BillingService
     public function processRenewals(): void
     {
         $services = Service::where('status', 'active')
-            ->where('next_billing_at', '<=', now()->addDays(7))
-            ->where('next_billing_at', '!=', null)
+            ->whereNotNull('next_billing_at')
+            ->where('next_billing_at', '<=', now()->addDays(1))
             ->get();
 
         $processedServiceIds = cache()->get('processed_renewals', []);

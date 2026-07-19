@@ -80,8 +80,8 @@ Route::get('/verify-email/{token}', function ($token) {
     return redirect('/client')->with('success', 'Email verified successfully!');
 })->name('verification.verify');
 
-// Auth routes
-Route::middleware('auth')->group(function () {
+// Auth routes (must be logged in and email verified)
+Route::middleware(['auth', 'verified.email'])->group(function () {
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');

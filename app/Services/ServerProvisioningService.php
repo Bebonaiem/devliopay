@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Service;
+use App\Notifications\ServiceActivated;
 use App\Notifications\ServiceStatusChanged;
+use App\Notifications\ServiceSuspended;
 use App\Services\Servers\ServerFactory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +35,7 @@ class ServerProvisioningService
 
             if ($result['success']) {
                 $service->update(['status' => 'active', 'activated_at' => now()]);
-                App::make(NotificationService::class)->notify($service->user, new ServiceStatusChanged($service, 'pending', 'active'));
+                App::make(NotificationService::class)->notify($service->user, new ServiceActivated($service));
             }
 
             return $result;
@@ -58,9 +60,8 @@ class ServerProvisioningService
             $result = $server->suspendServer($service, $settings, $properties);
 
             if ($result['success']) {
-                $oldStatus = $service->status;
                 $service->update(['status' => 'suspended', 'suspended_at' => now()]);
-                App::make(NotificationService::class)->notify($service->user, new ServiceStatusChanged($service, $oldStatus, 'suspended'));
+                App::make(NotificationService::class)->notify($service->user, new ServiceSuspended($service));
             }
 
             return $result;

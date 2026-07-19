@@ -88,7 +88,6 @@ class TestPterodactyl extends Command
                     } else {
                         $this->warn("    Allocations endpoint: HTTP {$allocResult->status()}");
                     }
-                    }
                 }
             } else {
                 $this->error('Failed to fetch nodes: HTTP ' . $response->status());

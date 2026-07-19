@@ -111,7 +111,7 @@ class PaymentService
             return;
         }
 
-        $serviceAddon = $invoice->serviceAddons ?? \App\Models\ServiceAddon::find($invoice->service_addon_id);
+        $serviceAddon = $invoice->serviceAddon ?? \App\Models\ServiceAddon::find($invoice->service_addon_id);
         if (!$serviceAddon) {
             return;
         }

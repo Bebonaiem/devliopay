@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\EmailVerificationToken;
 use App\Models\User;
 use App\Notifications\VerifyEmail;
+use App\Notifications\WelcomeUser;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +34,6 @@ class RegisterController extends Controller
             'name' => trim($request->first_name . ' ' . $request->last_name),
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'plain_password' => $request->password,
             'email_verified_at' => null,
         ]);
 
@@ -51,6 +52,12 @@ class RegisterController extends Controller
         }
 
         Auth::login($user);
+
+        try {
+            app(NotificationService::class)->notify($user, new WelcomeUser);
+        } catch (\Exception $e) {
+            // welcome notification failure shouldn't block registration
+        }
 
         return redirect('/client')->with('success', 'Account created! Please check your email to verify your address.');
     }

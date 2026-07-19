@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
-    // Public API routes
-    Route::get('/products', [ClientApiController::class, 'products']);
+    // Public API routes with rate limiting
+    Route::get('/products', [ClientApiController::class, 'products'])->middleware('throttle:30,1');
 
     // Auth endpoints with rate limiting
     Route::post('/auth/token', function (Request $request) {
@@ -36,8 +36,8 @@ Route::prefix('v1')->group(function () {
         ]);
     })->middleware('throttle:30,1');
 
-    // Authenticated routes
-    Route::middleware('auth:sanctum')->group(function () {
+    // Authenticated routes with rate limiting
+    Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::get('/dashboard', [ClientApiController::class, 'dashboard']);
         Route::get('/services', [ClientApiController::class, 'services']);
         Route::get('/services/{service}', [ClientApiController::class, 'service']);

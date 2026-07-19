@@ -11,7 +11,6 @@ use App\Services\Gateways\StripeGateway;
 use App\Services\InvoicePdfService;
 use App\Services\NotificationService;
 use App\Services\PaymentService;
-use App\Services\ServerProvisioningService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -73,6 +72,7 @@ class InvoiceController extends Controller
             $user->decrement('balance', $invoice->total);
 
             $paymentService->processInvoicePayment($invoice, 'balance', 'BAL-'.Str::random(12));
+            app(NotificationService::class)->notify($user, new PaymentReceived($invoice, $invoice->total));
 
             return response()->json(['success' => true, 'paid' => true]);
         }
@@ -174,6 +174,7 @@ class InvoiceController extends Controller
             $user->decrement('balance', $invoice->total);
 
             $paymentService->processInvoicePayment($invoice, 'balance', 'BAL-'.Str::random(12));
+            app(NotificationService::class)->notify($user, new PaymentReceived($invoice, $invoice->total));
 
             return redirect()->route('client.invoices.show', $invoice)
                 ->with('success', 'Payment completed using credit balance!');
@@ -284,34 +285,7 @@ class InvoiceController extends Controller
             app(NotificationService::class)->notify(Auth::user(), new PaymentReceived($invoice, $invoice->total));
         }
 
-        // Check if provisioning was successful (already handled by processInvoicePayment)
-        $provisionError = null;
-        $pendingServices = $invoice->user->services()
-            ->where('status', 'pending')
-            ->get();
-
-        if ($pendingServices->isNotEmpty()) {
-            $provisioning = new ServerProvisioningService;
-            foreach ($pendingServices as $service) {
-                $result = $provisioning->provision($service);
-                if ($result['success']) {
-                    $service->update(['status' => 'active', 'activated_at' => now()]);
-                } else {
-                    $provisionError = $result['error'] ?? 'Unknown provisioning error';
-                    Log::error('Service provisioning failed after payment', [
-                        'invoice_id' => $invoice->id,
-                        'service_id' => $service->id,
-                        'error' => $provisionError,
-                    ]);
-                }
-            }
-        }
-
-        if ($provisionError) {
-            return redirect()->route('client.invoices.show', $invoice)
-                ->with('warning', 'Payment confirmed, but server provisioning encountered an issue: '.$provisionError.' Please try again from the service page or contact support.');
-        }
-
+        // Provisioning is handled inside processInvoicePayment - no need to duplicate
         return redirect()->route('client.invoices.show', $invoice)
             ->with('success', 'Payment confirmed successfully!');
     }

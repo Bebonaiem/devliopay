@@ -26,6 +26,17 @@ class KnowledgeBaseController extends Controller
 
     public function show(string $slug)
     {
+        $article = KnowledgeBaseArticle::published()
+            ->where('slug', $slug)
+            ->first();
+
+        if ($article) {
+            $article->incrementViews();
+
+            return view('knowledgebase.show', compact('article'));
+        }
+
+        // Fallback: treat as category name (list articles in category)
         $articles = KnowledgeBaseArticle::published()
             ->where('category', $slug)
             ->orderBy('sort_order')

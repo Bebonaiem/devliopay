@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductPricing;
 use App\Models\Service;
 use App\Notifications\InvoiceCreated;
+use App\Models\Setting;
 use App\Services\BillingService;
 use App\Services\NotificationService;
 use App\Services\PromoCodeService;
@@ -39,23 +40,24 @@ class CartController extends Controller
                 $price = $pivotCurrency?->pivot->amount ?? 0;
                 $setupFee = $pivotCurrency?->pivot->setup_fee ?? 0;
                 $qty = $item['quantity'] ?? 1;
-                $currencySymbol = $pivotCurrency?->symbol ?? $defaultCurrencySymbol;
+                $currencySymbol = $pivotCurrency?->symbol ?? Setting::get('default_currency_symbol', '$');
 
                 $selectedAddons = collect($item['addon_ids'] ?? [])->map(fn ($id) => $addonsMap[$id] ?? null)->filter()->values()->all();
                 $addonsTotal = collect($selectedAddons)->sum('price');
 
+                $lineTotal = ($price * $qty) + $setupFee + $addonsTotal;
                 $items[$key] = [
                     'product' => $product,
                     'pricing' => $pricing,
                     'price' => $price,
                     'setup_fee' => $setupFee,
                     'quantity' => $qty,
-                    'line_total' => ($price * $qty) + $setupFee,
+                    'line_total' => $lineTotal,
                     'currency_symbol' => $currencySymbol,
                     'addons' => $selectedAddons,
                     'addons_total' => $addonsTotal,
                 ];
-                $subtotal += ($price * $qty) + $setupFee + $addonsTotal;
+                $subtotal += $lineTotal;
             }
         }
 
@@ -70,8 +72,8 @@ class CartController extends Controller
 
         $promoDiscount = session()->get('promo_discount', 0);
         $promoCode = session()->get('promo_code', null);
-        if ($promoDiscount > 0 && $total > $promoDiscount) {
-            $total -= $promoDiscount;
+        if ($promoDiscount > 0) {
+            $total = max(0, $total - $promoDiscount);
         }
 
         return view('cart.index', compact('items', 'subtotal', 'tax', 'total', 'promoDiscount', 'promoCode'));
@@ -93,11 +95,15 @@ class CartController extends Controller
         $quantity = max(1, (int) ($request->quantity ?? 1));
 
         if (isset($cart[$key])) {
-            if ($product && $product->allow_quantity === 'separated') {
-                $cart[$key]['quantity'] = $quantity;
-            } else {
-                return redirect()->route('cart.index')
-                    ->with('error', 'This item is already in your cart.');
+            if ($product) {
+                if ($product->allow_quantity === 'separated') {
+                    $cart[$key]['quantity'] = $quantity;
+                } elseif ($product->allow_quantity === 'combined') {
+                    $cart[$key]['quantity'] = ($cart[$key]['quantity'] ?? 1) + $quantity;
+                } else {
+                    return redirect()->route('cart.index')
+                        ->with('error', 'This item is already in your cart.');
+                }
             }
             $cart[$key]['currency_id'] = $request->currency_id ?? null;
             $cart[$key]['addon_ids'] = $request->addon_ids ?? [];
@@ -237,8 +243,8 @@ class CartController extends Controller
         // Apply promo discount
         $promoDiscount = session()->get('promo_discount', 0);
         $promoCode = session()->get('promo_code');
-        if ($promoDiscount > 0 && $totalWithTax > $promoDiscount) {
-            $totalWithTax -= $promoDiscount;
+        if ($promoDiscount > 0) {
+            $totalWithTax = max(0, $totalWithTax - $promoDiscount);
         }
 
         $order = null;

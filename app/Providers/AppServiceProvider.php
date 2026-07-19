@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Invoice;
+use App\Models\Service;
 use App\Models\Setting;
 use App\Models\TicketThread;
+use App\Policies\InvoicePolicy;
+use App\Policies\ServicePolicy;
 use App\Policies\TicketThreadPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -25,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Gate::policy(TicketThread::class, TicketThreadPolicy::class);
+        Gate::policy(Invoice::class, InvoicePolicy::class);
+        Gate::policy(Service::class, ServicePolicy::class);
 
         View::composer('*', function ($view) {
             $stripePublishable = Setting::get('stripe_publishable_key') ?: (config('services.stripe.publishable_key') ?? '');
