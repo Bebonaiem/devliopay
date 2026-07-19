@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -162,11 +163,14 @@ class ReportsPage extends Page implements HasForms
 
         $this->revenueByMonth = [];
         $maxRevenue = 0;
-        for ($i = 11; $i >= 0; $i--) {
-            $month = now()->subMonths($i);
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $monthCount = $start->diffInMonths($end) + 1;
+        for ($i = $monthCount - 1; $i >= 0; $i--) {
+            $month = $end->copy()->subMonthsNoOverflow($i);
             $revenue = Invoice::where('status', 'paid')
-                ->whereMonth('paid_at', $month->month)
                 ->whereYear('paid_at', $month->year)
+                ->whereMonth('paid_at', $month->month)
                 ->sum('total');
             $this->revenueByMonth[] = [
                 'month' => $month->format('M'),
