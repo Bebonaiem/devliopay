@@ -33,7 +33,7 @@ class PromoCodeResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(50)
-                            ->toUpperCase(),
+                            ->mutateDehydratedStateUsing(fn ($state) => strtoupper($state)),
                         Forms\Components\TextInput::make('description')
                             ->maxLength(255),
                         Forms\Components\Select::make('type')

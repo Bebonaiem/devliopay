@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\InvoiceResource\Pages;
+use App\Filament\Resources\InvoiceResource\RelationManagers\TransactionsRelationManager;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -257,7 +258,7 @@ class InvoiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\TransactionsRelationManager::class,
+            TransactionsRelationManager::class,
         ];
     }
 
