@@ -31,7 +31,6 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
             ->brandName(Setting::get('company_name', config('app.name', 'DevlioPay')))
             ->brandLogo(Setting::get('company_logo') ? asset('storage/'.Setting::get('company_logo')) : asset('logo.svg'))
             ->colors([
