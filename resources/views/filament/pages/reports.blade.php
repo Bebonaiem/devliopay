@@ -21,7 +21,7 @@
                 </button>
             @endforeach
         </div>
-        <form wire:submit="loadStats" class="mt-3">
+        <form wire:submit.prevent="loadStats" class="mt-3">
             <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:0.75rem;">
                 <div style="flex:1;min-width:150px;">
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Start Date</label>
@@ -202,7 +202,6 @@
                             <td class="py-4 px-6">
                                 <x-filament::badge :color="match($order['status']) {
                                     'completed' => 'success',
-                                    'paid' => 'success',
                                     default => 'gray',
                                 }" size="xs">{{ ucfirst($order['status']) }}</x-filament::badge>
                             </td>

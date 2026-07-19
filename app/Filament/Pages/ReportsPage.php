@@ -134,7 +134,7 @@ class ReportsPage extends Page implements HasForms
             ->whereYear('paid_at', now()->year)
             ->sum('total');
 
-        $this->stats['total_orders'] = Order::whereIn('status', ['paid', 'completed'])
+        $this->stats['total_orders'] = Order::where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
@@ -198,7 +198,7 @@ class ReportsPage extends Page implements HasForms
         }
 
         $this->recentOrders = Order::with('user')
-            ->whereIn('status', ['paid', 'completed'])
+            ->where('status', 'completed')
             ->orderByDesc('created_at')
             ->limit(5)
             ->get()
