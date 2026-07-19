@@ -126,7 +126,7 @@ class InvoiceController extends Controller
 
             $http = Http::withHeaders([
                 'Authorization' => 'Bearer '.$secretKey,
-                'Stripe-Version' => '2026-03-25.dahlia',
+                'Stripe-Version' => '2026-06-24.dahlia',
             ])->timeout(30);
 
             if (app()->environment('local', 'testing')) {
@@ -256,7 +256,7 @@ class InvoiceController extends Controller
 
             $http = Http::withHeaders([
                 'Authorization' => 'Bearer '.$secretKey,
-                'Stripe-Version' => '2026-03-25.dahlia',
+                'Stripe-Version' => '2026-06-24.dahlia',
             ])->timeout(30);
 
             if (app()->environment('local', 'testing')) {

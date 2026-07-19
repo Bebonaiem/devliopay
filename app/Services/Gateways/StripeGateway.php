@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class StripeGateway implements GatewayInterface
 {
-    private const API_VERSION = '2025-04-30';
+    private const API_VERSION = '2026-06-24.dahlia';
 
     private string $secretKey;
 
