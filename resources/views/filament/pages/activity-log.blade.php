@@ -48,7 +48,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-12 text-center text-white">
-                                <i class="fas fa-clock text-gray-300 text-4xl mb-3 block"></i>
+                                <x-heroicon-o-clock class="w-12 h-12 mx-auto text-white/30 mb-3" />
                                 No activity logs found
                             </td>
                         </tr>
@@ -64,7 +64,7 @@
             <div class="flex gap-1">
                 @if($logs->previousPageUrl())
                     <button wire:click="previousPage" class="px-3 py-1 text-sm rounded-lg bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20">
-                        <i class="fas fa-chevron-left"></i>
+                        <x-heroicon-o-chevron-left class="w-4 h-4" />
                     </button>
                 @endif
                 @foreach($logs->getUrlRange(max(1, $logs->currentPage() - 2), min($logs->lastPage(), $logs->currentPage() + 2)) as $page => $url)
@@ -74,7 +74,7 @@
                 @endforeach
                 @if($logs->nextPageUrl())
                     <button wire:click="nextPage" class="px-3 py-1 text-sm rounded-lg bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20">
-                        <i class="fas fa-chevron-right"></i>
+                        <x-heroicon-o-chevron-right class="w-4 h-4" />
                     </button>
                 @endif
             </div>
