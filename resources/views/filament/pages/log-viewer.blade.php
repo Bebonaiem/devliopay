@@ -46,6 +46,7 @@
                             <th class="text-left py-2 px-3 font-medium text-white w-48">Timestamp</th>
                             <th class="text-left py-2 px-3 font-medium text-white w-24">Level</th>
                             <th class="text-left py-2 px-3 font-medium text-white">Message</th>
+                            <th class="text-center py-2 px-3 font-medium text-white w-16">Copy</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/5">
@@ -77,10 +78,23 @@
                                         {{ $entry['message'] }}
                                     @endif
                                 </td>
+                                <td class="py-2 px-3 text-center">
+                                    <button x-data="{ copied: false }"
+                                            x-on:click="
+                                                navigator.clipboard.writeText(@js($entry['message']));
+                                                copied = true;
+                                                setTimeout(() => copied = false, 1500);
+                                            "
+                                            x-tooltip="copied ? 'Copied!' : 'Copy message'"
+                                            class="p-1.5 rounded-lg transition-all hover:bg-white/10 text-gray-400 hover:text-white">
+                                        <x-heroicon-o-clipboard x-show="!copied" class="w-4 h-4" />
+                                        <x-heroicon-o-check x-show="copied" class="w-4 h-4 text-emerald-400" />
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="py-8 text-center text-white">
+                                <td colspan="4" class="py-8 text-center text-white">
                                     <x-heroicon-o-document-text class="w-8 h-8 mx-auto mb-2 opacity-50" />
                                     No log entries found
                                 </td>
