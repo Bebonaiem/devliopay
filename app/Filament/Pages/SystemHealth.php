@@ -150,7 +150,6 @@ class SystemHealth extends Page
             'max_execution_time' => ini_get('max_execution_time') . 's',
             'post_max_size' => ini_get('post_max_size'),
             'disk_usage' => $this->getDiskUsage(),
-            'extensions' => $this->checkExtensions(),
         ];
     }
 
@@ -327,15 +326,5 @@ class SystemHealth extends Page
             $i++;
         }
         return round($bytes, 2) . ' ' . $units[$i];
-    }
-
-    private function checkExtensions(): array
-    {
-        $required = ['openssl', 'curl', 'mbstring', 'json', 'xml', 'pdo', 'tokenizer', 'bcmath', 'intl', 'gd', 'fileinfo'];
-        $results = [];
-        foreach ($required as $ext) {
-            $results[$ext] = extension_loaded($ext);
-        }
-        return $results;
     }
 }

@@ -206,19 +206,6 @@
                     </div>
                 </div>
 
-                {{-- PHP Extensions --}}
-                <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
-                    <h3 class="text-lg font-semibold mb-3 text-white">PHP Extensions</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        @foreach($systemInfo['extensions'] as $name => $loaded)
-                            <div class="flex items-center text-sm">
-                                <span class="{{ $loaded ? 'text-green-500' : 'text-red-500' }} mr-2">&#10003;</span>
-                                <span class="{{ $loaded ? 'text-white' : 'text-white' }}">{{ $name }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-
                 {{-- System Info --}}
                 <div class="bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-3 text-white">System Details</h3>
