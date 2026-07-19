@@ -9,17 +9,12 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Forms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
 
-class ReportsPage extends Page implements HasForms
+class ReportsPage extends Page
 {
-    use InteractsWithForms;
-
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationGroup = 'Reports';
@@ -32,7 +27,11 @@ class ReportsPage extends Page implements HasForms
 
     protected static string $view = 'filament.pages.reports';
 
-    public ?array $data = [];
+    #[Url]
+    public string $startDate = '';
+
+    #[Url]
+    public string $endDate = '';
 
     public array $stats = [];
 
@@ -51,41 +50,20 @@ class ReportsPage extends Page implements HasForms
     public function mount(): void
     {
         $this->currencySymbol = Setting::get('default_currency_symbol', '$');
-        $this->data = [
-            'start_date' => now()->subDays(30)->format('Y-m-d'),
-            'end_date' => now()->format('Y-m-d'),
-        ];
+
+        if ($this->startDate && $this->endDate) {
+            $this->periodLabel = 'Custom Range';
+        } else {
+            $this->startDate = now()->subDays(30)->format('Y-m-d');
+            $this->endDate = now()->format('Y-m-d');
+        }
 
         $this->loadStats();
     }
 
-    public function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Grid::make(3)
-                    ->schema([
-                        Forms\Components\DatePicker::make('start_date')
-                            ->label('Start Date')
-                            ->required(),
-                        Forms\Components\DatePicker::make('end_date')
-                            ->label('End Date')
-                            ->required(),
-                        Forms\Components\Actions\ActionContainer::make(
-                            Forms\Components\Actions\Action::make('filter')
-                                ->label('Apply Filter')
-                                ->icon('heroicon-m-funnel')
-                                ->color('primary')
-                                ->action(fn () => $this->loadStats())
-                        ),
-                    ]),
-            ])
-            ->statePath('data');
-    }
-
     public function setPreset(string $preset): void
     {
-        $start = match ($preset) {
+        $this->startDate = match ($preset) {
             'today' => now()->format('Y-m-d'),
             'yesterday' => now()->subDay()->format('Y-m-d'),
             'week' => now()->startOfWeek()->format('Y-m-d'),
@@ -97,13 +75,10 @@ class ReportsPage extends Page implements HasForms
             default => now()->subDays(30)->format('Y-m-d'),
         };
 
-        $end = match ($preset) {
+        $this->endDate = match ($preset) {
             'yesterday' => now()->subDay()->format('Y-m-d'),
             default => now()->format('Y-m-d'),
         };
-
-        $this->data['start_date'] = $start;
-        $this->data['end_date'] = $end;
 
         $this->periodLabel = match ($preset) {
             'today' => 'Today',
@@ -122,9 +97,8 @@ class ReportsPage extends Page implements HasForms
 
     public function loadStats(): void
     {
-        $data = $this->data;
-        $startDate = $data['start_date'] ?? now()->subDays(30)->format('Y-m-d');
-        $endDate = $data['end_date'] ?? now()->format('Y-m-d');
+        $startDate = $this->startDate ?: now()->subDays(30)->format('Y-m-d');
+        $endDate = $this->endDate ?: now()->format('Y-m-d');
 
         $this->stats['total_revenue'] = Invoice::where('status', 'paid')
             ->whereBetween('paid_at', [$startDate, $endDate])

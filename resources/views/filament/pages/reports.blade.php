@@ -25,12 +25,12 @@
             <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:0.75rem;">
                 <div style="flex:1;min-width:150px;">
                     <label class="text-xs font-medium text-gray-500 mb-1 block">Start Date</label>
-                    <input type="date" wire:model="data.start_date"
+                    <input type="date" wire:model="startDate"
                            class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none" />
                 </div>
                 <div style="flex:1;min-width:150px;">
                     <label class="text-xs font-medium text-gray-500 mb-1 block">End Date</label>
-                    <input type="date" wire:model="data.end_date"
+                    <input type="date" wire:model="endDate"
                            class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none" />
                 </div>
                 <button type="submit" class="px-6 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-500 transition-colors">
