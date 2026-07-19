@@ -44,7 +44,13 @@
             @if($notifications->count() > 0)
                 <div class="space-y-2">
                     @foreach($notifications as $notification)
-                    <div class="glass rounded-2xl p-5 {{ $notification->read_at ? 'opacity-60' : '' }}" id="notification-{{ $notification->id }}">
+                    <div class="glass rounded-2xl p-5 transition-all hover:border-brand-500/20 cursor-pointer {{ $notification->read_at ? 'opacity-60' : '' }}"
+                         id="notification-{{ $notification->id }}"
+                         @click.prevent="
+                             @if(!empty($notification->data['url']))
+                             window.location.href = '{{ $notification->data['url'] }}';
+                             @endif
+                         ">
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 rounded-xl {{ $notification->read_at ? 'bg-white/5' : 'bg-brand-500/10' }} flex items-center justify-center flex-shrink-0 mt-0.5">
                                 @php
@@ -62,12 +68,9 @@
                                 <p class="text-xs text-gray-400 mt-1">{{ $notification->data['message'] ?? '' }}</p>
                                 <div class="flex items-center gap-3 mt-2">
                                     <p class="text-[11px] text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
-                                    @if(!empty($notification->data['url']))
-                                    <a href="{{ $notification->data['url'] }}" class="text-[11px] text-brand-400 hover:text-brand-300 font-medium">View</a>
-                                    @endif
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" @click.stop>
                                 @unless($notification->read_at)
                                 <button onclick="markAsRead('{{ $notification->id }}')" class="w-2 h-2 rounded-full bg-brand-500 flex-shrink-0 mt-2 hover:bg-brand-400 transition-colors" title="Mark as read"></button>
                                 @endunless
