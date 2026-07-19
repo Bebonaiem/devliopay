@@ -41,9 +41,16 @@ class ActivityLogPage extends Page
         return ActivityLog::distinct()->pluck('type')->sort()->toArray();
     }
 
+    public function updatedFilterType(): void
+    {
+        $this->page = 1;
+    }
+
     public function previousPage(): void
     {
-        $this->page = max(1, $this->page - 1);
+        if ($this->page > 1) {
+            $this->page--;
+        }
     }
 
     public function nextPage(): void
