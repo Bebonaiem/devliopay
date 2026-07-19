@@ -36,7 +36,7 @@ class LoginController extends Controller
                 ])->onlyInput('email');
             }
 
-            if (Auth::user()->two_factor_enabled && !Auth::user()->is_admin) {
+            if (Auth::user()->two_factor_enabled) {
                 $userId = Auth::id();
                 Auth::logout();
                 $request->session()->invalidate();

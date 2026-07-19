@@ -7,6 +7,7 @@ use App\Filament\Widgets\DevlioPayInfoWidget;
 use App\Filament\Widgets\RevenueChart;
 use App\Filament\Widgets\RevenueOverview;
 use App\Models\Setting;
+use App\Http\Middleware\RequireTwoFactor;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -74,6 +75,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                RequireTwoFactor::class,
             ])
             ->userMenuItems([
                 MenuItem::make()
