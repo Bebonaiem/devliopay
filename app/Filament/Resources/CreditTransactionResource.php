@@ -56,7 +56,8 @@ class CreditTransactionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.users.edit', $record->user_id)),
                 Tables\Columns\TextColumn::make('amount')
                     ->formatStateUsing(fn ($state): string => $symbol . number_format((float) $state, 2))
                     ->sortable(),

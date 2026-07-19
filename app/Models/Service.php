@@ -97,6 +97,11 @@ class Service extends Model
         return $this->hasMany(TicketThread::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function addons(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Addon::class, 'service_addons')

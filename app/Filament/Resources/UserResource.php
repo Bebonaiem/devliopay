@@ -23,6 +23,11 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getModel()::count());
+    }
+
     protected static ?string $modelLabel = 'User';
 
     protected static ?string $pluralModelLabel = 'Users';
@@ -133,7 +138,13 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\ServicesRelationManager::class,
+            RelationManagers\OrdersRelationManager::class,
+            RelationManagers\InvoicesRelationManager::class,
+            RelationManagers\TransactionsRelationManager::class,
+            RelationManagers\TicketsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

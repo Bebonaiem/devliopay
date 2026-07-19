@@ -27,6 +27,11 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getModel()::where('status', 'pending')->count());
+    }
+
     protected static ?string $recordTitleAttribute = 'number';
 
     protected static ?string $modelLabel = 'Order';
@@ -198,7 +203,8 @@ class OrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.users.edit', $record->user_id)),
                 Tables\Columns\TextColumn::make('items.product.name')
                     ->label('Products')
                     ->limit(30)

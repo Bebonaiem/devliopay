@@ -28,6 +28,11 @@ class InvoiceResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getModel()::whereIn('status', ['pending', 'overdue'])->count());
+    }
+
     private static function getCurrencySymbol(): string
     {
         $default = Currency::where('is_default', true)->first();
@@ -117,7 +122,8 @@ class InvoiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.users.edit', $record->user_id)),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -250,7 +256,9 @@ class InvoiceResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\TransactionsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

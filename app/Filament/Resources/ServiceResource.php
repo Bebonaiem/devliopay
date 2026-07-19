@@ -24,6 +24,11 @@ class ServiceResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getModel()::where('status', 'active')->count());
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -80,9 +85,11 @@ class ServiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.users.edit', $record->user_id)),
                 Tables\Columns\TextColumn::make('product.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.products.edit', $record->product_id)),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -211,7 +218,9 @@ class ServiceResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\TicketsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

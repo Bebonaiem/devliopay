@@ -31,10 +31,12 @@ class TransactionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.users.edit', $record->user_id)),
                 Tables\Columns\TextColumn::make('invoice.number')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => $record->invoice_id ? route('filament.admin.resources.invoices.edit', $record->invoice_id) : null),
                 Tables\Columns\TextColumn::make('amount')
                     ->money(fn ($record) => $record->currency?->code ?? Currency::defaultCode())
                     ->sortable(),
