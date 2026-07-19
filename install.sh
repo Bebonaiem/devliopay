@@ -143,11 +143,25 @@ fi
     echo ""
 }
 
+# ─── Swap (prevents OOM on low-RAM VPS) ────────────────────────────────────────
+setup_swap() {
+    if [ "$(free -m | awk '/^Swap:/ {print $2}')" -eq 0 ]; then
+        print_info "No swap detected — creating 2G swap file..."
+        fallocate -l 2G /swapfile
+        chmod 600 /swapfile
+        mkswap /swapfile >/dev/null 2>&1
+        swapon /swapfile >/dev/null 2>&1
+        echo '/swapfile none swap sw 0 0' >> /etc/fstab
+        print_ok "2G swap created and enabled"
+    fi
+}
+
 print_banner
 setup_config
+setup_swap
 
 # ─── Installation ──────────────────────────────────────────────────────────────
-TOTAL_STEPS=12
+TOTAL_STEPS=13
 
 print_step 1 $TOTAL_STEPS "System Update & Dependencies"
 
@@ -160,7 +174,7 @@ fi
 
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3 ufw
+apt-get install -y software-properties-common curl wget git unzip zip nginx sqlite3 ufw fail2ban
 print_ok "System packages installed"
 
 print_step 2 $TOTAL_STEPS "Configuring Firewall"
@@ -216,7 +230,7 @@ OVERRIDE
 systemctl daemon-reload
 print_ok "PHP-FPM configured for devliopay user"
 
-print_step 7 $TOTAL_STEPS "Cloning Repository"
+print_step 6 $TOTAL_STEPS "Cloning Repository"
 if [ -d "$INSTALL_DIR" ]; then
     cd /
     rm -rf "$INSTALL_DIR"
@@ -227,11 +241,11 @@ cd "$INSTALL_DIR"
 sudo -u devliopay git config --global --add safe.directory "$INSTALL_DIR"
 print_ok "Repository cloned to ${INSTALL_DIR}"
 
-print_step 8 $TOTAL_STEPS "Installing PHP Dependencies"
+print_step 7 $TOTAL_STEPS "Installing PHP Dependencies"
 sudo -u devliopay composer install --no-dev --optimize-autoloader --no-interaction
 print_ok "Composer packages installed"
 
-print_step 9 $TOTAL_STEPS "Environment Configuration"
+print_step 8 $TOTAL_STEPS "Environment Configuration"
 sudo -u devliopay cp .env.example .env
 
 # Ensure database directory and file are writable by devliopay
@@ -274,12 +288,12 @@ fi
 
 print_ok "Environment configured"
 
-print_step 10 $TOTAL_STEPS "Database Migration & Seeding"
+print_step 9 $TOTAL_STEPS "Database Migration & Seeding"
 sudo -u devliopay php artisan migrate --force --no-interaction
 sudo -u devliopay php artisan db:seed --force --no-interaction
 print_ok "Database migrated and seeded"
 
-print_step 11 $TOTAL_STEPS "Creating Admin User"
+print_step 10 $TOTAL_STEPS "Creating Admin User"
 sudo -u devliopay php artisan tinker --execute="
 \$user = App\Models\User::create([
     'name' => '${ADMIN_NAME}',
@@ -293,7 +307,7 @@ echo 'Admin user created: ' . \$user->email;
 " 2>&1
 print_ok "Admin user created: ${ADMIN_EMAIL}"
 
-print_step 12 $TOTAL_STEPS "Permissions, Cache & Nginx"
+print_step 11 $TOTAL_STEPS "Permissions, Cache, Filament Assets & Nginx"
 chown -R devliopay:devliopay "$INSTALL_DIR"
 chmod -R 755 "$INSTALL_DIR"
 chmod -R 775 "$INSTALL_DIR/storage" 2>/dev/null || true
@@ -302,11 +316,24 @@ chmod -R 775 "$INSTALL_DIR/bootstrap/cache" 2>/dev/null || true
 # Create required directories
 sudo -u devliopay mkdir -p storage/logs storage/framework/views storage/framework/sessions storage/framework/cache storage/app/public/livewire-tmp
 
+# Create public asset dirs (may not exist yet for filament:assets)
+mkdir -p "$INSTALL_DIR/public/js/filament" "$INSTALL_DIR/public/css/filament"
+chown devliopay:devliopay "$INSTALL_DIR/public/js/filament" "$INSTALL_DIR/public/css/filament"
+chmod 775 "$INSTALL_DIR/public/js/filament" "$INSTALL_DIR/public/css/filament"
+
 # Clear and build cache AS devliopay user
 sudo -u devliopay php artisan storage:link --force --no-interaction
+
+# Publish Filament frontend assets before cache
+sudo -u devliopay php artisan filament:assets --no-interaction 2>/dev/null || {
+    print_info "filament:assets failed, trying vendor:publish..."
+    sudo -u devliopay php artisan vendor:publish --tag=filament-assets --force --no-interaction 2>/dev/null || true
+}
+
 sudo -u devliopay php artisan route:cache --no-interaction
 sudo -u devliopay php artisan view:cache --no-interaction
 sudo -u devliopay php artisan icon:cache --no-interaction 2>/dev/null || true
+sudo -u devliopay php artisan event:cache --no-interaction 2>/dev/null || true
 # Do NOT use config:cache - it freezes APP_URL and breaks HTTPS detection
 
 # Final ownership pass after cache files are created
@@ -368,6 +395,44 @@ rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 systemctl restart php8.3-fpm
 systemctl restart nginx
 print_ok "Nginx configured and running"
+
+print_step 12 $TOTAL_STEPS "Configuring Redis for Cache & Sessions"
+systemctl enable redis-server 2>/dev/null || true
+systemctl start redis-server 2>/dev/null || true
+# Switch .env to use Redis for cache and sessions if Redis is running
+if systemctl is-active --quiet redis-server 2>/dev/null; then
+    sudo -u devliopay php artisan tinker --execute="
+        file_put_contents(base_path('.env'), str_replace(
+            ['CACHE_DRIVER=file', 'SESSION_DRIVER=file'],
+            ['CACHE_DRIVER=redis', 'SESSION_DRIVER=redis'],
+            file_get_contents(base_path('.env'))
+        ));
+        echo 'Redis configured as cache & session driver';
+    " 2>&1
+    print_ok "Redis enabled for cache & sessions"
+    # Restart queue worker to pick up new driver
+    systemctl restart devliopay-worker 2>/dev/null || true
+else
+    print_info "Redis not available — using file-based cache & sessions"
+fi
+
+print_step 13 $TOTAL_STEPS "Enabling Security Hardening"
+systemctl enable fail2ban 2>/dev/null || true
+systemctl start fail2ban 2>/dev/null || true
+# Basic fail2ban config for SSH
+cat > /etc/fail2ban/jail.local <<FAIL2BAN
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+
+[sshd]
+enabled = true
+port = ssh
+logpath = %(sshd_log)s
+FAIL2BAN
+systemctl restart fail2ban 2>/dev/null || true
+print_ok "fail2ban configured (SSH protection enabled)"
 
 # ─── SSL Certificate (domains only) ──────────────────────────────────────────
 if [ "$IS_IP" = false ]; then
