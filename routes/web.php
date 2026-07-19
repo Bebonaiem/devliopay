@@ -46,16 +46,21 @@ Route::withoutMiddleware([VerifyCsrfToken::class])->group(function () {
     Route::post('/webhooks/paypal', [WebhookController::class, 'paypal'])->name('webhooks.paypal');
 });
 
+// Redirect Filament's admin login to the custom login page (so admins get 2FA)
+Route::get('/admin/login', function () {
+    return redirect('/login');
+})->name('filament.admin.auth.login');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:10,1');
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
-});
 
-Route::get('/two-factor/challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'showForm'])->name('two-factor.challenge');
-Route::post('/two-factor/challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'verify'])->name('two-factor.challenge.verify');
+    Route::get('/two-factor/challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'showForm'])->name('two-factor.challenge');
+    Route::post('/two-factor/challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'verify'])->name('two-factor.challenge.verify');
+});
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Password Reset Routes

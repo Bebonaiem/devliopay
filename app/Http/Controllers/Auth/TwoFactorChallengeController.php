@@ -13,14 +13,8 @@ class TwoFactorChallengeController extends Controller
 {
     public function showForm()
     {
-        $userId = session('2fa_user_id');
-
-        if (! $userId && ! Auth::check()) {
+        if (! session('2fa_user_id')) {
             return redirect()->route('login');
-        }
-
-        if (Auth::check() && session()->has('2fa_verified_at')) {
-            return redirect()->intended(Auth::user()->is_admin ? '/admin' : '/client');
         }
 
         return view('auth.two-factor-challenge');
@@ -32,7 +26,7 @@ class TwoFactorChallengeController extends Controller
             'code' => 'required|string|size:6',
         ]);
 
-        $userId = session('2fa_user_id') ?? Auth::id();
+        $userId = session('2fa_user_id');
 
         if (! $userId) {
             return redirect()->route('login');
@@ -52,18 +46,9 @@ class TwoFactorChallengeController extends Controller
         }
 
         session()->forget('2fa_user_id');
-        session()->put('2fa_verified_at', now()->timestamp);
 
-        if (! Auth::check()) {
-            Auth::login($user, $request->boolean('remember'));
-            $request->session()->regenerate();
-        }
-
-        $intendedUrl = session()->pull('2fa_intended_url');
-
-        if ($intendedUrl) {
-            return redirect()->to($intendedUrl);
-        }
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
 
         if ($user->is_admin) {
             return redirect()->intended('/admin');
