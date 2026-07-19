@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\File;
+use Livewire\Attributes\Url;
 
 class LogViewer extends Page
 {
@@ -23,8 +24,10 @@ class LogViewer extends Page
 
     public array $logFiles = [];
 
+    #[Url]
     public string $selectedLog = 'laravel.log';
 
+    #[Url]
     public string $filterLevel = 'all';
 
     public function mount(): void
@@ -117,9 +120,8 @@ class LogViewer extends Page
         return array_reverse($entries);
     }
 
-    public function setSelectedLog(string $value): void
+    public function updatedSelectedLog(): void
     {
-        $this->selectedLog = $value;
         $this->loadLogs();
     }
 
