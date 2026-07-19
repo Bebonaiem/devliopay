@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\ActivityLog;
 use Filament\Pages\Page;
+use Livewire\Attributes\Url;
 
 class ActivityLogPage extends Page
 {
@@ -19,8 +20,10 @@ class ActivityLogPage extends Page
 
     protected static string $view = 'filament.pages.activity-log';
 
+    #[Url]
     public ?string $filterType = null;
 
+    #[Url(as: 'page')]
     public int $page = 1;
 
     public int $perPage = 25;
