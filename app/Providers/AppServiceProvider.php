@@ -24,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
         if (config('app.url') && str_starts_with(config('app.url'), 'https')) {
             URL::forceScheme('https');
         }
